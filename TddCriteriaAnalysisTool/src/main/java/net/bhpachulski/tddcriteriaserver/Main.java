@@ -5,9 +5,19 @@ import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.bhpachulski.tddcriteriaserver.model.Eclemma.Report;
 import net.bhpachulski.tddcriteriaserver.model.TDDCriteriaProjectProperties;
 import net.bhpachulski.tddcriteriaserver.model.TestSuiteSession;
+import net.bhpachulski.tddcriteriaserver.model.analysis.TDDCriteriaProjectSnapshot;
+import com.google.common.io.Files;
+import net.bhpachulski.tddcriteriaserver.model.Eclemma.Counter;
 
 /**
  *
@@ -15,7 +25,14 @@ import net.bhpachulski.tddcriteriaserver.model.TestSuiteSession;
  */
 public class Main {
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_M_d_HH_mm");
+        SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        
+        String propFilePath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/tddCriteriaProjectProperties.xml";
+        String jUnitFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/junitTrack/";
+        String EclemmaFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/coverageTrack/";
         
         JacksonXmlModule module;
         module = new JacksonXmlModule();
@@ -24,14 +41,69 @@ public class Main {
         ObjectMapper xmlMapper;
         xmlMapper = new XmlMapper(module);
         
-        File fProp = new File("/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/tddCriteriaProjectProperties.xml");
+        Map<Date, TDDCriteriaProjectSnapshot> projectTimeLine = new HashMap<>();
+        
+        File fProp = new File(propFilePath);
         TDDCriteriaProjectProperties prop = xmlMapper.readValue(fProp, TDDCriteriaProjectProperties.class);
+
+        List<File> jUnitFiles = Arrays.asList(new File(jUnitFolderPath).listFiles());
+        for (File jUnitFile : jUnitFiles) {
+            TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
+            
+            TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
+            snapshotPutJunit.setjUnitSession(tss);
+            
+            projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 14)), snapshotPutJunit);
+
+        }        
         
-        File fJunit = new File("/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/junitTrack/2015_7_1_09_35_52.xml");
-        TestSuiteSession tss = xmlMapper.readValue(fJunit, TestSuiteSession.class);
+        List<File> eclemmaFiles = Arrays.asList(new File(EclemmaFolderPath).listFiles());
+        for (File eclemmaFile : eclemmaFiles) {
+            Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
+            
+            projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 14))).setEclemmaSession(rep);            
+        }
         
-        File fEclemma = new File("/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/coverageTrack/2015_7_1_09_35_52.xml");
-        Report rep = xmlMapper.readValue(fEclemma, Report.class);
+        int cont = 1;
+        for (Map.Entry<Date, TDDCriteriaProjectSnapshot> entrySet : projectTimeLine.entrySet()) {
+            Date key = entrySet.getKey();
+            TDDCriteriaProjectSnapshot value = entrySet.getValue();
+            
+            System.out.print(cont);
+            System.out.print(";");
+            System.out.print(sdfShow.format(key));
+            System.out.print(";");
+            
+            //qnt casos de teste
+            System.out.print(value.getjUnitSession().getTestCases().size());
+            System.out.print(";");
+            
+            //qnt casos de teste passando
+            System.out.print(value.getjUnitSession().getTestCases().stream().filter(t -> t.getFailDetail() == null).count());
+            System.out.print(";");
+
+            //qnt casos de teste falhando
+            System.out.print(value.getjUnitSession().getTestCases().stream().filter(t -> t.getFailDetail() != null).count());
+            System.out.print(";");
+
+            if (value.getEclemmaSession() != null) {
+                for (Counter counter : value.getEclemmaSession().getCounter()) {
+//                    INSTRUCTION  BRANCH  LINE  COMPLEXITY  METHOD  CLASS 
+//                    System.out.print(" " + counter.getType() + " ");
+                    
+                    System.out.print(counter.getCovered());
+                    System.out.print(";");
+                    
+                    System.out.print(counter.getMissed());
+                    System.out.print(";");
+                }
+            }
+
+            System.out.print("\n");
+            
+            cont++;
+        }
+        
 
     }
     
