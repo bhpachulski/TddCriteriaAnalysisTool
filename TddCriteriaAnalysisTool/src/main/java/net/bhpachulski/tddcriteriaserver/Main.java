@@ -30,9 +30,9 @@ public class Main {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_M_d_HH_mm");
         SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         
-        String propFilePath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/tddCriteriaProjectProperties.xml";
-        String jUnitFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/junitTrack/";
-        String EclemmaFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TesteDoPlugin/bowlinggame/TDDBowlingGame/tddCriteria/coverageTrack/";
+        String propFilePath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TDDCriteriaBowlingGame/tddcriteriabowlinggame/tddCriteria/tddCriteriaProjectProperties.xml";
+        String jUnitFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TDDCriteriaBowlingGame/tddcriteriabowlinggame/tddCriteria/junitTrack/";
+        String EclemmaFolderPath = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TDDCriteriaBowlingGame/tddcriteriabowlinggame/tddCriteria/coverageTrack/";
         
         JacksonXmlModule module;
         module = new JacksonXmlModule();
@@ -53,15 +53,14 @@ public class Main {
             TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
             snapshotPutJunit.setjUnitSession(tss);
             
-            projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 14)), snapshotPutJunit);
-
+            projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 15)), snapshotPutJunit);
         }        
         
         List<File> eclemmaFiles = Arrays.asList(new File(EclemmaFolderPath).listFiles());
         for (File eclemmaFile : eclemmaFiles) {
             Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
             
-            projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 14))).setEclemmaSession(rep);            
+            projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 15))).setEclemmaSession(rep);            
         }
         
         int cont = 1;
