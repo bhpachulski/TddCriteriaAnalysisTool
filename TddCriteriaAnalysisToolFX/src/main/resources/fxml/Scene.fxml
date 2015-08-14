@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="pane" prefHeight="780.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.bhpachulski.tddcriteria.fx.FXMLController">
+    <children>
+        <Button fx:id="button" layoutX="855.0" layoutY="735.0" onAction="#exibirInformacoesAction" text="Exibir Informações" /><Button fx:id="btnFolder" layoutX="605.0" layoutY="735.0" mnemonicParsing="false" onAction="#buscarDiretorioAction" text="Buscar Diretório" /><Button fx:id="btnLimpar" layoutX="735.0" layoutY="735.0" mnemonicParsing="false" onAction="#limparGraficoAction" text="Limpar Gráfico" /><CheckBox fx:id="checkCT" layoutX="55.0" layoutY="628.0" mnemonicParsing="false" onAction="#checkCTAction" selected="true" text="Qnt. Casos de Teste" /><Label layoutX="55.0" layoutY="600.0" text="Casos de Teste" /><CheckBox fx:id="checkCTPassando" layoutX="55.0" layoutY="653.0" mnemonicParsing="false" onAction="#checkCTPassandoAction" selected="true" text="Qnt. Casos de Teste Passando" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkCTFalhando" layoutX="55.0" layoutY="677.0" mnemonicParsing="false" onAction="#checkCTFalhandoAction" selected="true" text="Qnt. Casos de Teste Falhando" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkLine" layoutX="300.0" layoutY="677.0" mnemonicParsing="false" onAction="#checkCoverageLine" selected="true" text="Line" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkBranch" layoutX="300.0" layoutY="653.0" mnemonicParsing="false" onAction="#checkCoverageBranch" selected="true" text="Branch" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><Label layoutX="300.0" layoutY="600.0" text="Casos de Teste" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkInstruction" layoutX="300.0" layoutY="628.0" mnemonicParsing="false" onAction="#checkCoverageInstruction" selected="true" text="Instruction" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkComplexity" layoutX="430.0" layoutY="677.0" mnemonicParsing="false" onAction="#checkCoverageComplexity" selected="true" text="Complexity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkMethod" layoutX="430.0" layoutY="628.0" mnemonicParsing="false" onAction="#checkCoverageMethod" selected="true" text="Method" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkClass" layoutX="430.0" layoutY="653.0" mnemonicParsing="false" onAction="#checkCoverageClass" selected="true" text="Class" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><ComboBox fx:id="cbIteracao1" layoutX="640.0" layoutY="625.0" prefHeight="26.0" prefWidth="175.0" xmlns:fx="http://javafx.com/fxml">
+  <items>
+    <FXCollections fx:factory="observableArrayList">
+      <String fx:value="Item 1" />
+      <String fx:value="Item 2" />
+      <String fx:value="Item 3" />
+    </FXCollections>
+  </items>
+</ComboBox><Label layoutX="555.0" layoutY="600.0" text="Casos de Teste" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><Label layoutX="555.0" layoutY="630.0" text="1ª Iteração" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><ComboBox fx:id="cbIteracao2" layoutX="640.0" layoutY="655.0" prefHeight="26.0" prefWidth="175.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<items>
+<FXCollections fx:factory="observableArrayList">
+<String fx:value="Item 1" />
+<String fx:value="Item 2" />
+<String fx:value="Item 3" />
+</FXCollections>
+</items>
+</ComboBox><ComboBox fx:id="cbIteracao3" layoutX="640.0" layoutY="685.0" prefHeight="26.0" prefWidth="175.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<items>
+<FXCollections fx:factory="observableArrayList">
+<String fx:value="Item 1" />
+<String fx:value="Item 2" />
+<String fx:value="Item 3" />
+</FXCollections>
+</items>
+</ComboBox><Label layoutX="555.0" layoutY="660.0" text="2ª Iteração" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><Label layoutX="555.0" layoutY="690.0" text="3ª Iteração" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><Button fx:id="btnPropertiesFile" layoutX="470.0" layoutY="735.0" mnemonicParsing="false" onAction="#savePropertiesFile" text="Salvar Properties" />
+    </children>
+</AnchorPane>
