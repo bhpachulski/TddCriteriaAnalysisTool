@@ -49,11 +49,17 @@ public class FXMLController implements Initializable {
     private XYChart.Data<String, Number> verticalMarkerSecondIteration;
     private XYChart.Data<String, Number> verticalMarkerThirdIteration;
     
+    private ChangeListener<Date> cbListenerIteracao1;
+    private ChangeListener<Date> cbListenerIteracao2;
+    private ChangeListener<Date> cbListenerIteracao3;
+    
     private ObjectMapper xmlMapper;
     private JacksonXmlModule module;
     
     private File fProp;
     private TDDCriteriaProjectProperties prop;
+    
+    private StringConverter<Date> dateConverter;
     
     private static final String propFilePath = "/tddCriteria/tddCriteriaProjectProperties.xml";
     private static final String jUnitFolderPath = "/tddCriteria/junitTrack/";
@@ -150,6 +156,8 @@ public class FXMLController implements Initializable {
         lnClass = new XYChart.Series();
 
         lineChart.removeAllVerticalValueMarkers();
+        
+        initComboIteracao();
     }
 
     @FXML
@@ -265,7 +273,7 @@ public class FXMLController implements Initializable {
 
         pane.getChildren().add(lineChartCoverage);
         
-        StringConverter<Date> dateConverter = new StringConverter<Date>() {
+        dateConverter = new StringConverter<Date>() {
 
             @Override
             public String toString(Date object) {
@@ -281,7 +289,56 @@ public class FXMLController implements Initializable {
                 }
             }
         };
+        
+        cbListenerIteracao1 = new ChangeListener<Date>() {
 
+            @Override
+            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
+                lineChart.removeHorizontalValueMarker(verticalMarkerFirstIteration);
+                
+                prop.setFirstIteration(newValue);
+                verticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+                lineChart.addVerticalValueMarker(verticalMarkerFirstIteration);
+            }
+            
+        };
+        
+        cbListenerIteracao2 = new ChangeListener<Date>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
+                lineChart.removeHorizontalValueMarker(verticalMarkerSecondIteration);
+                
+                prop.setSecondIteration(newValue);
+                verticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+                lineChart.addVerticalValueMarker(verticalMarkerSecondIteration);
+            }
+            
+        };
+        
+        cbListenerIteracao3 = new ChangeListener<Date>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
+                lineChart.removeHorizontalValueMarker(verticalMarkerThirdIteration);
+                
+                prop.setThirdIteration(newValue);
+                verticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+                lineChart.addVerticalValueMarker(verticalMarkerThirdIteration);
+            }
+            
+        };
+
+        initComboIteracao();
+        
+    }
+    
+    private void initComboIteracao() {
+        
+        cbIteracao1.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao1);
+        cbIteracao2.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao2);
+        cbIteracao3.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao3);
+        
         cbIteracao1.setDisable(true);
         cbIteracao2.setDisable(true);
         cbIteracao3.setDisable(true);
@@ -293,7 +350,6 @@ public class FXMLController implements Initializable {
         cbIteracao1.getItems().clear();
         cbIteracao2.getItems().clear();
         cbIteracao3.getItems().clear();
-        
     }
 
     public void lerArquivos() throws IOException, ParseException {
@@ -315,7 +371,6 @@ public class FXMLController implements Initializable {
         }
 
         List<File> eclemmaFiles = Arrays.asList(new File(projectFolder + EclemmaFolderPath).listFiles());
-        System.out.println(eclemmaFiles);
         for (File eclemmaFile : eclemmaFiles) {
             Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
 
@@ -409,44 +464,9 @@ public class FXMLController implements Initializable {
         cbIteracao2.setVisibleRowCount(6);
         cbIteracao3.setVisibleRowCount(6);
         
-        cbIteracao1.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Date>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerFirstIteration);
-                
-                prop.setFirstIteration(newValue);
-                verticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerFirstIteration);
-            }
-            
-        });
-        
-        cbIteracao2.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Date>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerSecondIteration);
-                
-                prop.setSecondIteration(newValue);
-                verticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerSecondIteration);
-            }
-            
-        });
-        
-        cbIteracao3.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Date>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerThirdIteration);
-                
-                prop.setThirdIteration(newValue);
-                verticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerThirdIteration);
-            }
-            
-        });
+        cbIteracao1.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao1);        
+        cbIteracao2.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao2);        
+        cbIteracao3.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao3);
               
     }
 
@@ -462,6 +482,7 @@ public class FXMLController implements Initializable {
     }
     
     private void saveUpdatedXmlPropertiesFile () throws IOException {
-        xmlMapper.writeValue(fProp, prop);
+        if (prop != null || fProp != null)
+            xmlMapper.writeValue(fProp, prop);
     }
 }
