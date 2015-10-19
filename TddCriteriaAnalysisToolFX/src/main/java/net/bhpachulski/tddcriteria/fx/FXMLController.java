@@ -45,9 +45,13 @@ public class FXMLController implements Initializable {
     private LineChartWithMarkers<String, Number> lineChart;
     private LineChartWithMarkers<String, Number> lineChartCoverage;
     
-    private XYChart.Data<String, Number> verticalMarkerFirstIteration;
-    private XYChart.Data<String, Number> verticalMarkerSecondIteration;
-    private XYChart.Data<String, Number> verticalMarkerThirdIteration;
+    private XYChart.Data<String, Number> testVerticalMarkerFirstIteration;
+    private XYChart.Data<String, Number> testVerticalMarkerSecondIteration;
+    private XYChart.Data<String, Number> testVerticalMarkerThirdIteration;
+    
+    private XYChart.Data<String, Number> coverageVerticalMarkerFirstIteration;
+    private XYChart.Data<String, Number> coverageVerticalMarkerSecondIteration;
+    private XYChart.Data<String, Number> coverageVerticalMarkerThirdIteration;
     
     private ChangeListener<Date> cbListenerIteracao1;
     private ChangeListener<Date> cbListenerIteracao2;
@@ -126,6 +130,9 @@ public class FXMLController implements Initializable {
         lineChart.setTitle("Casos de teste");
         lineChartCoverage.setTitle("Cobertura");
 
+        limparGraficoAction();
+        initChecks();
+        initComboIteracao();
         lerArquivos();
     }
 
@@ -141,7 +148,7 @@ public class FXMLController implements Initializable {
     }
 
     @FXML
-    private void limparGraficoAction(ActionEvent event) {
+    private void limparGraficoAction() {
         lineChart.getData().clear();
         lineChartCoverage.getData().clear();
 
@@ -151,13 +158,29 @@ public class FXMLController implements Initializable {
         lnInstruction = new XYChart.Series();
         lnBranch = new XYChart.Series();
         lnLine = new XYChart.Series();
-        lnComplexity = new XYChart.Series();
+//        lnComplexity = new XYChart.Series();
         lnMethod = new XYChart.Series();
         lnClass = new XYChart.Series();
 
         lineChart.removeAllVerticalValueMarkers();
+        lineChartCoverage.removeAllVerticalValueMarkers();
         
         initComboIteracao();
+        initChecks ();
+    }
+    
+    public void initChecks () {
+        checkCT.setSelected(true);
+        checkCTPassando.setSelected(true);
+        checkCTFalhando.setSelected(true);
+        checkInstruction.setSelected(true);
+        checkBranch.setSelected(true);
+        checkLine.setSelected(true);
+        checkComplexity.setSelected(true);
+        checkMethod.setSelected(true);
+        checkClass.setSelected(true);
+        
+        checkComplexity.setVisible(false);
     }
 
     @FXML
@@ -294,11 +317,14 @@ public class FXMLController implements Initializable {
 
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerFirstIteration);
+                lineChart.removeHorizontalValueMarker(testVerticalMarkerFirstIteration);
+                lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerFirstIteration);
                 
                 prop.setFirstIteration(newValue);
-                verticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerFirstIteration);
+                testVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+                coverageVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+                lineChart.addVerticalValueMarker(testVerticalMarkerFirstIteration);
+                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFirstIteration);
             }
             
         };
@@ -307,11 +333,14 @@ public class FXMLController implements Initializable {
 
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerSecondIteration);
+                lineChart.removeHorizontalValueMarker(testVerticalMarkerSecondIteration);
+                lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerSecondIteration);
                 
                 prop.setSecondIteration(newValue);
-                verticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerSecondIteration);
+                testVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+                coverageVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+                lineChart.addVerticalValueMarker(testVerticalMarkerSecondIteration);
+                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSecondIteration);
             }
             
         };
@@ -320,11 +349,14 @@ public class FXMLController implements Initializable {
 
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {                
-                lineChart.removeHorizontalValueMarker(verticalMarkerThirdIteration);
+                lineChart.removeHorizontalValueMarker(testVerticalMarkerThirdIteration);
+                lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerThirdIteration);
                 
                 prop.setThirdIteration(newValue);
-                verticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
-                lineChart.addVerticalValueMarker(verticalMarkerThirdIteration);
+                testVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+                coverageVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+                lineChart.addVerticalValueMarker(testVerticalMarkerThirdIteration);
+                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerThirdIteration);
             }
             
         };
@@ -383,6 +415,7 @@ public class FXMLController implements Initializable {
         lnQntCasosDeTeste.setName("Qnt. Casos de Teste");
         lnQntCasosDeTestePassando.setName("Qnt. Casos de Teste Passando");
         lnQntCasosDeTesteFalhando.setName("Qnt. Casos de Teste Falhando");
+        
         lnInstruction.setName("Instruction Coverage");
         lnBranch.setName("Branch Coverage");
         lnLine.setName("Line Coverage");
@@ -417,9 +450,9 @@ public class FXMLController implements Initializable {
                     lnLine.getData().add(new XYChart.Data(sdfShow.format(key), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
                 });
 
-                value.getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.COMPLEXITY).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    lnComplexity.getData().add(new XYChart.Data(sdfShow.format(key), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
-                });
+//                value.getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.COMPLEXITY).collect(Collectors.toList()).stream().forEach((counter) -> {
+//                    lnComplexity.getData().add(new XYChart.Data(sdfShow.format(key), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+//                });
 
                 value.getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
                     lnMethod.getData().add(new XYChart.Data(sdfShow.format(key), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
@@ -437,16 +470,24 @@ public class FXMLController implements Initializable {
         lineChart.setCursor(Cursor.CROSSHAIR);
 
         lineChartCoverage.getData().clear();
-        lineChartCoverage.getData().addAll(lnInstruction, lnBranch, lnLine, lnComplexity, lnMethod, lnClass);
+        lineChartCoverage.getData().addAll(lnInstruction, lnBranch, lnLine, lnMethod, lnClass);
         lineChartCoverage.setCursor(Cursor.CROSSHAIR);
 
-        verticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
-        verticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
-        verticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+        testVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+        testVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+        testVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
         
-        lineChart.addVerticalValueMarker(verticalMarkerFirstIteration);
-        lineChart.addVerticalValueMarker(verticalMarkerSecondIteration);
-        lineChart.addVerticalValueMarker(verticalMarkerThirdIteration);
+        coverageVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+        coverageVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+        coverageVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+        
+        lineChart.addVerticalValueMarker(testVerticalMarkerFirstIteration);
+        lineChart.addVerticalValueMarker(testVerticalMarkerSecondIteration);
+        lineChart.addVerticalValueMarker(testVerticalMarkerThirdIteration);
+        
+        lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFirstIteration);
+        lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSecondIteration);
+        lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerThirdIteration);
 
         cbIteracao1.getItems().addAll(projectTimeLine.keySet());
         cbIteracao2.getItems().addAll(projectTimeLine.keySet());
