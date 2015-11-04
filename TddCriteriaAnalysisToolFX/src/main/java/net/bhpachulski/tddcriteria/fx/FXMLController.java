@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
@@ -32,6 +34,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.util.StringConverter;
@@ -44,8 +47,8 @@ import org.apache.commons.io.FileUtils;
 
 public class FXMLController implements Initializable {
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_M_d_HH_mm");
-    SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     private LineChartWithMarkers<String, Number> lineChart;
     private LineChartWithMarkers<String, Number> lineChartCoverage;
@@ -140,7 +143,7 @@ public class FXMLController implements Initializable {
 
     private DirectoryChooser folderChooser = new DirectoryChooser();
 
-    private String projectFolder = "/Users/bhpachulski/Documents/Projetos/GIT/EclemmaCriteriaTDD/TDDCriteriaBowlingGame/tddcriteriabowlinggame";
+    private String projectFolder = "/Users/bhpachulski/Documents/Projetos/GIT/experimentos/1415900 - Junior Nakamura/1415900";
 
     private XYChart.Series lnQntCasosDeTeste = new XYChart.Series();
     private XYChart.Series lnQntCasosDeTestePassando = new XYChart.Series();
@@ -177,10 +180,10 @@ public class FXMLController implements Initializable {
     @FXML
     private void criarCSVAction(ActionEvent event) throws IOException, ParseException {
         this.configureChooser(folderChooser);
-        File file = folderChooser.showDialog(pane.getScene().getWindow()); 
-        
+        File file = folderChooser.showDialog(pane.getScene().getWindow());
+
         StringBuilder fileContent = new StringBuilder();
-        
+
         if (file.isDirectory()) {
 
             projectFolder = file.getAbsolutePath();
@@ -208,7 +211,7 @@ public class FXMLController implements Initializable {
                         fileContent.append("; ");
 
                         if (studentTimeLine.getValue().getjUnitSession() != null) {
- 
+
                             studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
 
                             //JUNIT
@@ -260,10 +263,10 @@ public class FXMLController implements Initializable {
                     }
                 }
             }
-            
+
             FileUtils.writeStringToFile(new File(projectFolder + "/studentsTimeline(" + sdf.format(new Date()) + ").csv"), fileContent.toString());
             System.out.println("DONE !");
-            
+
         } else {
             System.out.println("SHOW ERROR MESSAGE !");
         }
@@ -620,13 +623,18 @@ public class FXMLController implements Initializable {
 
                     //JUNIT
                     //Qnt Casos de Teste 
-                    lnQntCasosDeTeste.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size()));
+                    
+                    XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                    qntCasosTesteData.setNode(new HoveredThresholdNode("LOL")); 
+                    
+                    lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
                     //Qnt Casos de Teste PASSANDO
                     lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
 
                     //Qnt Casos de Teste FALHANDO
                     lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
+
                 } else {
 
                 }
@@ -783,16 +791,30 @@ public class FXMLController implements Initializable {
         fProp = new File(projectFolder + propFilePath);
         prop = xmlMapper.readValue(fProp, TDDCriteriaProjectProperties.class);
 
+        List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
+        for (String lnTddStages : tddStages) {
+
+            if (!lnTddStages.trim().isEmpty()) {
+
+                TDDCriteriaProjectSnapshot snapshotPutTDDStage = new TDDCriteriaProjectSnapshot();
+                snapshotPutTDDStage.setTddStage(lnTddStages.split(":")[1]);
+
+                projectTimeLine.put(sdf.parse(lnTddStages.substring(0, 19)), snapshotPutTDDStage);
+
+            }
+        }
+
         List<File> eclemmaFiles = Arrays.asList(new File(projectFolder + EclemmaFolderPath).listFiles());
         for (File eclemmaFile : eclemmaFiles) {
 
-            if (!eclemmaFile.getName().startsWith("tddStageTrack")) {
+            if (eclemmaFile.getName().endsWith("xml")) {
                 Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
 
-                TDDCriteriaProjectSnapshot snapshotPutEclemma = new TDDCriteriaProjectSnapshot();
-                snapshotPutEclemma.setEclemmaSession(rep);
-
-                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 18)), snapshotPutEclemma);
+                try {
+                    projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 19))).setEclemmaSession(rep);
+                } catch (NullPointerException e) {
+                    System.out.println("Eclemma File Discartado");
+                }
             }
 
         }
@@ -800,26 +822,21 @@ public class FXMLController implements Initializable {
 
         List<File> jUnitFiles = Arrays.asList(new File(projectFolder + jUnitFolderPath).listFiles());
         for (File jUnitFile : jUnitFiles) {
-            TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
+            if (jUnitFile.getName().endsWith("xml")) {
+                TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
 
-            try {
-                projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18))).setjUnitSession(tss);
-            } catch (NullPointerException e) {
-                TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
-                snapshotPutJunit.setjUnitSession(tss);
-
-                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18)), snapshotPutJunit);
+                try {
+                    projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 19))).setjUnitSession(tss);
+                } catch (NullPointerException e) {
+                    System.out.println("JUnit File Discartado");
+//                TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
+//                snapshotPutJunit.setjUnitSession(tss);
+//
+//                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18)), snapshotPutJunit);
+                }
             }
-
         }
         System.out.println("JUnit files: " + jUnitFiles.size());
-
-        List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
-        for (String lnTddStages : tddStages) {
-            if (!lnTddStages.trim().isEmpty() && projectTimeLine.get(sdf.parse(lnTddStages.substring(0, 18))) != null) {
-                projectTimeLine.get(sdf.parse(lnTddStages.substring(0, 18))).setTddStage(lnTddStages.split(":")[1]);
-            }
-        }
 
         return projectTimeLine;
     }
