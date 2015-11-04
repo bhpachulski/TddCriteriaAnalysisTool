@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -73,6 +74,8 @@ public class FXMLController implements Initializable {
     private ChangeListener<Date> cbListenerIteracao4;
     private ChangeListener<Date> cbListenerIteracao5;
     private ChangeListener<Date> cbListenerIteracao6;
+    
+    DecimalFormat df = new DecimalFormat("#.00");
 
     private ObjectMapper xmlMapper;
     private JacksonXmlModule module;
@@ -610,38 +613,19 @@ public class FXMLController implements Initializable {
                 id.setText(String.valueOf(prop.getCurrentStudent().getId()));
 
                 //HORA
-                System.out.print(sdfShow.format(studentTimeLine.getKey()));
+//                System.out.print(sdfShow.format(studentTimeLine.getKey()));
 
                 //TDD STAGE
-                System.out.print(studentTimeLine.getValue().getTddStage());
+//                System.out.print(studentTimeLine.getValue().getTddStage());    
 
-                System.out.println("");
-
-                if (studentTimeLine.getValue().getjUnitSession() != null) {
-
-                    studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
-
-                    //JUNIT
-                    //Qnt Casos de Teste 
-                    
-                    XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
-                    qntCasosTesteData.setNode(new HoveredThresholdNode("LOL")); 
-                    
-                    lnQntCasosDeTeste.getData().add(qntCasosTesteData);
-
-                    //Qnt Casos de Teste PASSANDO
-                    lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
-
-                    //Qnt Casos de Teste FALHANDO
-                    lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
-
-                } else {
-
-                }
-
+                StringBuilder coverageTooltip = new StringBuilder();
+                coverageTooltip.append("\n");
+                
                 if (studentTimeLine.getValue().getEclemmaSession() != null) {
+                    
                     studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        lnClass.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                        Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                        lnClass.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), classCoverage));                        
                     });
 
                     studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
@@ -653,12 +637,46 @@ public class FXMLController implements Initializable {
                     });
 
                     studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        lnInstruction.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                        Double instructionCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                        lnInstruction.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), instructionCoverage));
+                        
+                        coverageTooltip.append(" * Instruction: ");
+                        coverageTooltip.append(df.format(instructionCoverage));
+                        coverageTooltip.append("\n");
                     });
 
                     studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        lnBranch.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                        Double branchCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                        
+                        lnBranch.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), branchCoverage));
+                        
+                        coverageTooltip.append(" * Branch: ");
+                        coverageTooltip.append(df.format(branchCoverage));
+                        coverageTooltip.append("\n");
                     });
+                    
+                }
+                
+                if (studentTimeLine.getValue().getjUnitSession() != null) {
+
+                    studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
+
+                    //JUNIT
+                    //Qnt Casos de Teste                     
+                    XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                    qntCasosTesteData.setNode(new HoveredThresholdNode(
+                            studentTimeLine.getValue().getTddStage() + 
+                            coverageTooltip.toString()
+                    )); 
+                    
+                    lnQntCasosDeTeste.getData().add(qntCasosTesteData);
+
+                    //Qnt Casos de Teste PASSANDO
+                    lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
+
+                    //Qnt Casos de Teste FALHANDO
+                    lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
+
                 } else {
 
                 }
