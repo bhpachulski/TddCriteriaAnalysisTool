@@ -74,7 +74,7 @@ public class FXMLController implements Initializable {
     private ChangeListener<Date> cbListenerIteracao4;
     private ChangeListener<Date> cbListenerIteracao5;
     private ChangeListener<Date> cbListenerIteracao6;
-    
+
     DecimalFormat df = new DecimalFormat("#.00");
 
     private ObjectMapper xmlMapper;
@@ -609,77 +609,69 @@ public class FXMLController implements Initializable {
 
             if (!studentTimeLine.getValue().getTddStage().isEmpty()) {
 
+                if ((studentTimeLine.getValue().getjUnitSession() == null) || (studentTimeLine.getValue().getEclemmaSession() == null) || (studentTimeLine.getValue().getTddStage().isEmpty())) {
+                    continue;
+                }
+
                 //RA
                 id.setText(String.valueOf(prop.getCurrentStudent().getId()));
 
                 //HORA
 //                System.out.print(sdfShow.format(studentTimeLine.getKey()));
-
                 //TDD STAGE
 //                System.out.print(studentTimeLine.getValue().getTddStage());    
-
                 StringBuilder coverageTooltip = new StringBuilder();
                 coverageTooltip.append("\n");
-                
-                if (studentTimeLine.getValue().getEclemmaSession() != null) {
-                    
-                    studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                        lnClass.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), classCoverage));                        
-                    });
 
-                    studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        lnMethod.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
-                    });
+                studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                    lnClass.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), classCoverage));
+                });
 
-                    studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        lnLine.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
-                    });
+                studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    lnMethod.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                });
 
-                    studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        Double instructionCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                        lnInstruction.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), instructionCoverage));
-                        
-                        coverageTooltip.append(" * Instruction: ");
-                        coverageTooltip.append(df.format(instructionCoverage));
-                        coverageTooltip.append("\n");
-                    });
+                studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    lnLine.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                });
 
-                    studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
-                        Double branchCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                        
-                        lnBranch.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), branchCoverage));
-                        
-                        coverageTooltip.append(" * Branch: ");
-                        coverageTooltip.append(df.format(branchCoverage));
-                        coverageTooltip.append("\n");
-                    });
-                    
-                }
-                
-                if (studentTimeLine.getValue().getjUnitSession() != null) {
+                studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    Double instructionCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                    lnInstruction.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), instructionCoverage));
 
-                    studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
+                    coverageTooltip.append(" * Instruction: ");
+                    coverageTooltip.append(df.format(instructionCoverage));
+                    coverageTooltip.append("\n");
+                });
+
+                studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    Double branchCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+
+                    lnBranch.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), branchCoverage));
+
+                    coverageTooltip.append(" * Branch: ");
+                    coverageTooltip.append(df.format(branchCoverage));
+                    coverageTooltip.append("\n");
+                });
+
+                studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
 
                     //JUNIT
-                    //Qnt Casos de Teste                     
-                    XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
-                    qntCasosTesteData.setNode(new HoveredThresholdNode(
-                            studentTimeLine.getValue().getTddStage() + 
-                            coverageTooltip.toString()
-                    )); 
-                    
-                    lnQntCasosDeTeste.getData().add(qntCasosTesteData);
+                //Qnt Casos de Teste                     
+                XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                qntCasosTesteData.setNode(new HoveredThresholdNode(
+                        studentTimeLine.getValue().getTddStage()
+                        + coverageTooltip.toString()
+                ));
 
-                    //Qnt Casos de Teste PASSANDO
-                    lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
+                lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
-                    //Qnt Casos de Teste FALHANDO
-                    lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
+                //Qnt Casos de Teste PASSANDO
+                lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
 
-                } else {
-
-                }
+                //Qnt Casos de Teste FALHANDO
+                lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
 
             }
         }
@@ -826,11 +818,11 @@ public class FXMLController implements Initializable {
         for (File eclemmaFile : eclemmaFiles) {
 
             if (eclemmaFile.getName().endsWith("xml")) {
-                Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
 
                 try {
+                    Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
                     projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 19))).setEclemmaSession(rep);
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     System.out.println("Eclemma File Discartado");
                 }
             }
@@ -841,16 +833,13 @@ public class FXMLController implements Initializable {
         List<File> jUnitFiles = Arrays.asList(new File(projectFolder + jUnitFolderPath).listFiles());
         for (File jUnitFile : jUnitFiles) {
             if (jUnitFile.getName().endsWith("xml")) {
-                TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
 
                 try {
+                    TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
+
                     projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 19))).setjUnitSession(tss);
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     System.out.println("JUnit File Discartado");
-//                TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
-//                snapshotPutJunit.setjUnitSession(tss);
-//
-//                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18)), snapshotPutJunit);
                 }
             }
         }

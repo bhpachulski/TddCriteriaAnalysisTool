@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.bhpachulski.tddcriteria.model.Eclemma.Report;
@@ -22,181 +23,394 @@ import net.bhpachulski.tddcriteria.model.Eclemma.Type;
 import net.bhpachulski.tddcriteria.model.TDDCriteriaProjectProperties;
 import net.bhpachulski.tddcriteria.model.TestSuiteSession;
 import net.bhpachulski.tddcriteria.model.analysis.TDDCriteriaProjectSnapshot;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 
 /**
  *
  * @author bhpachulski
  */
 public class ProjectsToCSV {
-    
+
     private TDDCriteriaProjectProperties prop;
-    
+
     private ObjectMapper xmlMapper;
     private JacksonXmlModule module;
-    
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_M_d_HH_mm_s");
-    
+
+    private File fProp;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
     private static final String propFilePath = "/tddCriteria/tddCriteriaProjectProperties.xml";
     private static final String jUnitFolderPath = "/tddCriteria/junitTrack/";
     private static final String EclemmaFolderPath = "/tddCriteria/coverageTrack/";
     private static final String tddStageTrackPath = "tddStageTrack.txt";
-    
-    
+
     public static void main(String[] args) throws IOException, ParseException {
-        
-//        "dd/MM/yyyy HH:mm:ss"
+
         SimpleDateFormat sdfShow = new SimpleDateFormat("HH:mm:ss");
-        
+
         ProjectsToCSV p = new ProjectsToCSV();
-        Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = p.readProjectByRootPath("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/");
-        
-        System.out.println("RA; HORÁRIO; TDD STAGE; QNT. CASOS DE TESTE; PASSANDO; FALHANDO; CLASS; METHOD; LINE; INSTRUCTION; BRANCH;");
-        
-        for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
-            
-            for (Map.Entry<Date, TDDCriteriaProjectSnapshot> studentTimeLine : studentTimeLineES.getValue().entrySet()) {
-               
-                if (!studentTimeLine.getValue().getTddStage().isEmpty()){
-                    
-                    //RA
-                    System.out.print(studentTimeLineES.getKey());
-                    System.out.print("; ");
-                    
-                    //HORA
-                    System.out.print(sdfShow.format(studentTimeLine.getKey()));                
-                    System.out.print("; ");
-                    
-                    //TDD STAGE
-                    System.out.print(studentTimeLine.getValue().getTddStage());
-                    System.out.print("; ");
-                 
-                    if (studentTimeLine.getValue().getjUnitSession() != null) {
-                        
-                        studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
-                        
-                        //JUNIT
-                        //Qnt Casos de Teste 
-                        System.out.print(studentTimeLine.getValue().getjUnitSession().getTestCases().size());
-                        System.out.print("; ");
+        String retorno = p.getCSVDadosResumido(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
 
-                        //Qnt Casos de Teste PASSANDO
-                        System.out.print(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
-                        System.out.print("; ");
+        System.out.println("**************************************************************************************");
+        System.out.println("**************************************************************************************");
+        System.out.println("**************************************************************************************");
 
-                        //Qnt Casos de Teste FALHANDO
-                        System.out.print(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
-                        System.out.print("; ");
-                    } else {
-                        System.out.print("SJUT; SJUT; SJUT;");
-                    }
-                    
-                    if (studentTimeLine.getValue().getEclemmaSession() != null) {
-                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {                        
-                            System.out.print(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
-                            System.out.print("; ");
-                        });
-                        
-                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {                        
-                            System.out.print(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
-                            System.out.print("; ");
-                        });
-                        
-                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {                        
-                            System.out.print(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
-                            System.out.print("; ");
-                        });
-                        
-                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {                        
-                            System.out.print(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
-                            System.out.print("; ");
-                        });
-                        
-                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {                        
-                            System.out.print(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
-                            System.out.print("; ");
-                        });
-                    } else {
-                        System.out.print("SEC; SEC; SEC; SEC; SEC;");
-                    }
+        System.out.println(retorno);
+    }
+
+    public String getCSVDadosResumido(File file) throws IOException, ParseException {
+
+        String projectFolder;
+        StringBuilder fileContent = new StringBuilder();
+
+        if (file.isDirectory()) {
+
+            projectFolder = file.getAbsolutePath();
+
+            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = readProjectByRootPath(projectFolder);
+
+            fileContent.append("RA; ");
+
+            for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
                 
-                    System.out.println("");
+                
+
+                TDDCriteriaProjectProperties propAluno = studentTimeLineES.getValue().entrySet().stream().map(Map.Entry::getValue).findFirst().get().getCriteriaProjectProperties();
+
+                Map<Date, TDDCriteriaProjectSnapshot> firstIteration = new TreeMap<>();
+                Map<Date, TDDCriteriaProjectSnapshot> secondIteration = new TreeMap<>();
+                Map<Date, TDDCriteriaProjectSnapshot> thirdteration = new TreeMap<>();
+                Map<Date, TDDCriteriaProjectSnapshot> fourthIteration = new TreeMap<>();
+                Map<Date, TDDCriteriaProjectSnapshot> fifithIteration = new TreeMap<>();
+                Map<Date, TDDCriteriaProjectSnapshot> sixthIteration = new TreeMap<>();
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getFirstIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getFirstIteration()))))
+                        .forEach(e -> {
+
+                            firstIteration.put(e.getKey(), e.getValue());
+
+                        });
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSecondIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getSecondIteration()))))
+                        .forEach(e -> {
+
+                            secondIteration.put(e.getKey(), e.getValue());
+
+                        });
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getThirdIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getThirdIteration()))))
+                        .forEach(e -> {
+
+                            thirdteration.put(e.getKey(), e.getValue());
+
+                        });
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getFourthIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getFourthIteration()))))
+                        .forEach(e -> {
+
+                            fourthIteration.put(e.getKey(), e.getValue());
+
+                        });
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getFifthIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getFifthIteration()))))
+                        .forEach(e -> {
+
+                            fifithIteration.put(e.getKey(), e.getValue());
+
+                        });
+
+                studentTimeLineES.getValue().entrySet().stream().filter(e -> (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSixthIteration())))
+                        || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getSixthIteration()))))
+                        .forEach(e -> {
+
+                            sixthIteration.put(e.getKey(), e.getValue());
+
+                        });
+                
+                System.out.print("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "'");
+
+                System.out.print(getIterationValues(firstIteration, "RED"));
+                System.out.print(getIterationValues(firstIteration, "GREEN"));
+                System.out.print(getIterationValues(firstIteration, "REFACTOR"));
+
+                System.out.print(getIterationValues(secondIteration, "RED"));
+                System.out.print(getIterationValues(secondIteration, "GREEN"));
+                System.out.print(getIterationValues(secondIteration, "REFACTOR"));
+
+                System.out.print(getIterationValues(thirdteration, "RED"));
+                System.out.print(getIterationValues(thirdteration, "GREEN"));
+                System.out.print(getIterationValues(thirdteration, "REFACTOR"));
+
+                System.out.print(getIterationValues(fourthIteration, "RED"));
+                System.out.print(getIterationValues(fourthIteration, "GREEN"));
+                System.out.print(getIterationValues(fourthIteration, "REFACTOR"));
+
+                System.out.print(getIterationValues(fifithIteration, "RED"));
+                System.out.print(getIterationValues(fifithIteration, "GREEN"));
+                System.out.print(getIterationValues(fifithIteration, "REFACTOR"));
+
+                System.out.print(getIterationValues(sixthIteration, "RED"));
+                System.out.print(getIterationValues(sixthIteration, "GREEN"));
+                System.out.print(getIterationValues(sixthIteration, "REFACTOR"));
+
+                System.out.println("   ");
+            }
+
+        } else {
+//            System.out.println("SHOW ERROR MESSAGE !");
+        }
+
+        return fileContent.toString();
+
+    }
+
+    public String getCSVDadosCompletos(File file) throws IOException, ParseException {
+
+        String projectFolder;
+        StringBuilder fileContent = new StringBuilder();
+
+        if (file.isDirectory()) {
+
+            projectFolder = file.getAbsolutePath();
+
+            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = readProjectByRootPath(projectFolder);
+
+            fileContent.append("RA; HORÁRIO; TDD STAGE; QNT. CASOS DE TESTE; PASSANDO; FALHANDO; CLASS; METHOD; LINE; INSTRUCTION; BRANCH; \n");
+
+            for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
+
+                for (Map.Entry<Date, TDDCriteriaProjectSnapshot> studentTimeLine : studentTimeLineES.getValue().entrySet()) {
+
+                    if (!studentTimeLine.getValue().getTddStage().isEmpty()) {
+
+                        //RA
+                        fileContent.append(studentTimeLineES.getKey());
+                        fileContent.append("; ");
+
+                        //HORA
+                        fileContent.append(sdfShow.format(studentTimeLine.getKey()));
+                        fileContent.append("; ");
+
+                        //TDD STAGE
+                        fileContent.append(studentTimeLine.getValue().getTddStage());
+                        fileContent.append("; ");
+
+                        if (studentTimeLine.getValue().getjUnitSession() != null) {
+
+                            studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
+
+                            //JUNIT
+                            //Qnt Casos de Teste 
+                            fileContent.append(studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                            fileContent.append("; ");
+
+                            //Qnt Casos de Teste PASSANDO
+                            fileContent.append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
+                            fileContent.append("; ");
+
+                            //Qnt Casos de Teste FALHANDO
+                            fileContent.append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
+                            fileContent.append("; ");
+                        } else {
+                            fileContent.append("SJUT; SJUT; SJUT;");
+                        }
+
+                        if (studentTimeLine.getValue().getEclemmaSession() != null) {
+                            studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
+                                fileContent.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                                fileContent.append("; ");
+                            });
+
+                            studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
+                                fileContent.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                                fileContent.append("; ");
+                            });
+
+                            studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
+                                fileContent.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                                fileContent.append("; ");
+                            });
+
+                            studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
+                                fileContent.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                                fileContent.append("; ");
+                            });
+
+                            studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
+                                fileContent.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                                fileContent.append("; ");
+                            });
+                        } else {
+                            fileContent.append("SEC; SEC; SEC; SEC; SEC;");
+                        }
+
+                        fileContent.append("\n");
+                    }
                 }
             }
+
+        } else {
+            System.out.println("SHOW ERROR MESSAGE !");
         }
-        
+
+        return fileContent.toString();
     }
-    
-    public Map<String, Map<Date, TDDCriteriaProjectSnapshot>> readProjectByRootPath (String rootPath) throws IOException, ParseException {
+
+    public Map<String, Map<Date, TDDCriteriaProjectSnapshot>> readProjectByRootPath(String rootPath) throws IOException, ParseException {
         Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeline = new HashMap<>();
-        
+
         for (File folder : Arrays.asList(new File(rootPath).listFiles())) {
             if (folder.isDirectory() && new File(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim()).exists()) {
-                
-                System.out.println(folder.getName());
+
+                System.out.println(" ----------------------------------- ");
+                System.out.println(" * " + folder.getName());
                 Map<Date, TDDCriteriaProjectSnapshot> timeline = readProject(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim());
-                
-                studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);                
+
+                studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);
             }
         }
-        
+
         return studentsTimeline;
     }
-    
+
     public Map<Date, TDDCriteriaProjectSnapshot> readProject(String projectFolder) throws IOException, ParseException {
-        
+
         module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         xmlMapper = new XmlMapper(module);
 
-
         Map<Date, TDDCriteriaProjectSnapshot> projectTimeLine = new TreeMap<>();
 
-        File fProp = new File(projectFolder + propFilePath);
+        fProp = new File(projectFolder + propFilePath);
         prop = xmlMapper.readValue(fProp, TDDCriteriaProjectProperties.class);
-        
-        List<File> eclemmaFiles = Arrays.asList(new File(projectFolder + EclemmaFolderPath).listFiles());        
+
+        List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
+        for (String lnTddStages : tddStages) {
+
+            if (!lnTddStages.trim().isEmpty()) {
+
+                TDDCriteriaProjectSnapshot snapshotPutTDDStage = new TDDCriteriaProjectSnapshot();
+                snapshotPutTDDStage.setTddStage(lnTddStages.split(":")[1]);
+
+                projectTimeLine.put(sdf.parse(lnTddStages.substring(0, 19)), snapshotPutTDDStage);
+
+                projectTimeLine.get(sdf.parse(lnTddStages.substring(0, 19))).setCriteriaProjectProperties(prop);
+
+            }
+        }
+
+        List<File> eclemmaFiles = Arrays.asList(new File(projectFolder + EclemmaFolderPath).listFiles());
         for (File eclemmaFile : eclemmaFiles) {
 
-            if (!eclemmaFile.getName().startsWith("tddStageTrack")) {
-                Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
-                
-                TDDCriteriaProjectSnapshot snapshotPutEclemma = new TDDCriteriaProjectSnapshot();
-                snapshotPutEclemma.setEclemmaSession(rep);
-                
-                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 18)), snapshotPutEclemma);     
+            if (eclemmaFile.getName().endsWith("xml")) {
+
+                try {
+                    Report rep = xmlMapper.readValue(eclemmaFile, Report.class);
+                    projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(eclemmaFile.getName()).substring(0, 19))).setEclemmaSession(rep);
+                } catch (Exception e) {
+//                    System.out.println("Eclemma File Discartado");
+                }
             }
-            
+
         }
-        System.out.println("Eclemma files: " + eclemmaFiles.size());
+        System.out.println("   + " + "Eclemma files: " + eclemmaFiles.size());
 
         List<File> jUnitFiles = Arrays.asList(new File(projectFolder + jUnitFolderPath).listFiles());
         for (File jUnitFile : jUnitFiles) {
-            TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
+            if (jUnitFile.getName().endsWith("xml")) {
 
-            try {
-                projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18))).setjUnitSession(tss);                            
-            } catch (NullPointerException e) {
-                TDDCriteriaProjectSnapshot snapshotPutJunit = new TDDCriteriaProjectSnapshot();
-                snapshotPutJunit.setjUnitSession(tss);
-                
-                projectTimeLine.put(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 18)), snapshotPutJunit);
-            }
-            
-        }
-        System.out.println("JUnit files: " + jUnitFiles.size());        
-        
-        List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
-        for (String lnTddStages : tddStages) {
-            if (!lnTddStages.trim().isEmpty() && projectTimeLine.get(sdf.parse(lnTddStages.substring(0, 18))) != null){
-                projectTimeLine.get(sdf.parse(lnTddStages.substring(0, 18))).setTddStage(lnTddStages.split(":")[1]);
+                try {
+                    TestSuiteSession tss = xmlMapper.readValue(jUnitFile, TestSuiteSession.class);
+                    projectTimeLine.get(sdf.parse(Files.getNameWithoutExtension(jUnitFile.getName()).substring(0, 19))).setjUnitSession(tss);
+                } catch (Exception e) {
+//                    System.out.println("JUnit File Discartado");
+                }
             }
         }
-        
+        System.out.println("   + " + "JUnit files: " + jUnitFiles.size());
+
         return projectTimeLine;
     }
-    
+
     public static double regraDeTres(double total, double especificos) {
         return 100 * especificos / (double) total;
     }
-    
+
+    public String getIterationValues(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
+        
+        StringBuilder studentLine = new StringBuilder();
+
+        if (iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).count() > 0) {
+
+            Entry<Date, TDDCriteriaProjectSnapshot> first = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).findFirst().get();
+            Entry<Date, TDDCriteriaProjectSnapshot> last = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).reduce((a, b) -> b).get();
+
+            studentLine.append(sdfShow.format(first.getKey()));
+            studentLine.append(";");
+            studentLine.append(sdfShow.format(last.getKey()));
+            studentLine.append(";");
+
+            Interval diferencaHoras = new Interval(new DateTime(first.getKey()), new DateTime(last.getKey()));
+            studentLine.append(diferencaHoras.toPeriod().getMinutes());
+            
+            if (last.getValue().getjUnitSession() != null) {
+                //Qnt Casos de Teste 
+                studentLine.append(last.getValue().getjUnitSession().getTestCases().size());
+                studentLine.append(";");
+
+                //Qnt Casos de Teste PASSANDO
+                studentLine.append(last.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
+                studentLine.append(";");
+
+                //Qnt Casos de Teste FALHANDO
+                studentLine.append(last.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
+                studentLine.append(";");
+            } else {
+                studentLine.append("0;0;0;");
+            }
+            
+            if (last.getValue().getEclemmaSession() != null) {
+                last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    studentLine.append(";");
+                });
+
+                last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    studentLine.append(";");
+                });
+
+                last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    studentLine.append(";");
+                });
+
+                last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    studentLine.append(";");
+                });
+
+                last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
+                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    studentLine.append(";");
+                });
+            } else {
+                studentLine.append("0;0;0;0;0;");
+            }
+
+        } else {
+            //System.out.println("Não foi encontrado um estágio " + tddStage);
+        }
+
+        return studentLine.toString();
+    }
+
 }

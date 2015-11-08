@@ -2,6 +2,7 @@ package net.bhpachulski.tddcriteria.model.analysis;
 
 import javax.xml.bind.annotation.XmlTransient;
 import net.bhpachulski.tddcriteria.model.Eclemma.Report;
+import net.bhpachulski.tddcriteria.model.TDDCriteriaProjectProperties;
 import net.bhpachulski.tddcriteria.model.TestSuiteSession;
 
 /**
@@ -15,6 +16,8 @@ public class TDDCriteriaProjectSnapshot {
     
     @XmlTransient
     private Report eclemmaSession;
+    
+    private TDDCriteriaProjectProperties criteriaProjectProperties;
     
     private String tddStage = "";
     
@@ -50,5 +53,14 @@ public class TDDCriteriaProjectSnapshot {
     public void setTddStage(String tddStage) {
         this.tddStage = tddStage;
     }
+
+    public TDDCriteriaProjectProperties getCriteriaProjectProperties() {
+        return criteriaProjectProperties;
+    }
+
+    public void setCriteriaProjectProperties(TDDCriteriaProjectProperties criteriaProjectProperties) {
+        this.criteriaProjectProperties = criteriaProjectProperties;
+    }
+    
     
 }
