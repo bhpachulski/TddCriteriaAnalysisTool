@@ -75,8 +75,6 @@ public class ProjectsToCSV {
             fileContent.append("RA; ");
 
             for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
-                
-                
 
                 TDDCriteriaProjectProperties propAluno = studentTimeLineES.getValue().entrySet().stream().map(Map.Entry::getValue).findFirst().get().getCriteriaProjectProperties();
 
@@ -135,33 +133,33 @@ public class ProjectsToCSV {
 
                         });
                 
-                System.out.print("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "'");
+                fileContent.append("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "'");
 
-                System.out.print(getIterationValues(firstIteration, "RED"));
-                System.out.print(getIterationValues(firstIteration, "GREEN"));
-                System.out.print(getIterationValues(firstIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(firstIteration, "RED"));
+                fileContent.append(getIterationValues(firstIteration, "GREEN"));
+                fileContent.append(getIterationValues(firstIteration, "REFACTOR"));
 
-                System.out.print(getIterationValues(secondIteration, "RED"));
-                System.out.print(getIterationValues(secondIteration, "GREEN"));
-                System.out.print(getIterationValues(secondIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(secondIteration, "RED"));
+                fileContent.append(getIterationValues(secondIteration, "GREEN"));
+                fileContent.append(getIterationValues(secondIteration, "REFACTOR"));
 
-                System.out.print(getIterationValues(thirdteration, "RED"));
-                System.out.print(getIterationValues(thirdteration, "GREEN"));
-                System.out.print(getIterationValues(thirdteration, "REFACTOR"));
+                fileContent.append(getIterationValues(thirdteration, "RED"));
+                fileContent.append(getIterationValues(thirdteration, "GREEN"));
+                fileContent.append(getIterationValues(thirdteration, "REFACTOR"));
 
-                System.out.print(getIterationValues(fourthIteration, "RED"));
-                System.out.print(getIterationValues(fourthIteration, "GREEN"));
-                System.out.print(getIterationValues(fourthIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(fourthIteration, "RED"));
+                fileContent.append(getIterationValues(fourthIteration, "GREEN"));
+                fileContent.append(getIterationValues(fourthIteration, "REFACTOR"));
 
-                System.out.print(getIterationValues(fifithIteration, "RED"));
-                System.out.print(getIterationValues(fifithIteration, "GREEN"));
-                System.out.print(getIterationValues(fifithIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(fifithIteration, "RED"));
+                fileContent.append(getIterationValues(fifithIteration, "GREEN"));
+                fileContent.append(getIterationValues(fifithIteration, "REFACTOR"));
 
-                System.out.print(getIterationValues(sixthIteration, "RED"));
-                System.out.print(getIterationValues(sixthIteration, "GREEN"));
-                System.out.print(getIterationValues(sixthIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(sixthIteration, "RED"));
+                fileContent.append(getIterationValues(sixthIteration, "GREEN"));
+                fileContent.append(getIterationValues(sixthIteration, "REFACTOR"));
 
-                System.out.println("   ");
+                fileContent.append("\n");
             }
 
         } else {
