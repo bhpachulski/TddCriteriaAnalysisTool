@@ -72,7 +72,9 @@ public class ProjectsToCSV {
 
             Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = readProjectByRootPath(projectFolder);
 
-            fileContent.append("RA; ");
+            fileContent.append("RA; HORÁRIO INICIO RED; HORÁRIO FIM RED; TEMPO RED; QNT CASOS DE TESTE RED; QNT CASOS DE TESTE PASSANDO RED; QNT CASOS DE TESTE FALHANDO RED; COBERTURA DE CLASS RED; COBERTURA DE METODO RED; COBERTURA DE LINHAS RED; COBERTURA DE INSTRUCAOES RED; COBERTURA DE RAMOS RED; " + 
+                    "HORÁRIO INICIO GREEN; HORÁRIO FIM GREEN; TEMPO GREEN; QNT CASOS DE TESTE GREEN; QNT CASOS DE TESTE PASSANDO GREEN; QNT CASOS DE TESTE FALHANDO GREEN; COBERTURA DE CLASS GREEN; COBERTURA DE METODO GREEN; COBERTURA DE LINHAS GREEN; COBERTURA DE INSTRUCAOES GREEN; COBERTURA DE RAMOS GREEN; " +
+                    "HORÁRIO INICIO REFACTOR; HORÁRIO FIM REFACTOR; TEMPO REFACTOR; QNT CASOS DE TESTE REFACTOR; QNT CASOS DE TESTE PASSANDO REFACTOR; QNT CASOS DE TESTE FALHANDO REFACTOR; COBERTURA DE CLASS REFACTOR; COBERTURA DE METODO REFACTOR; COBERTURA DE LINHAS REFACTOR; COBERTURA DE INSTRUCAOES REFACTOR; COBERTURA DE RAMOS REFACTOR; \n");
 
             for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
 
@@ -133,7 +135,7 @@ public class ProjectsToCSV {
 
                         });
                 
-                fileContent.append("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "'");
+                fileContent.append("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "';");
 
                 fileContent.append(getIterationValues(firstIteration, "RED"));
                 fileContent.append(getIterationValues(firstIteration, "GREEN"));
@@ -351,10 +353,8 @@ public class ProjectsToCSV {
             Entry<Date, TDDCriteriaProjectSnapshot> first = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).findFirst().get();
             Entry<Date, TDDCriteriaProjectSnapshot> last = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).reduce((a, b) -> b).get();
 
-            studentLine.append(sdfShow.format(first.getKey()));
-            studentLine.append(";");
-            studentLine.append(sdfShow.format(last.getKey()));
-            studentLine.append(";");
+            studentLine.append("'" + sdfShow.format(first.getKey()) + "';");
+            studentLine.append("'" + sdfShow.format(last.getKey())+ "';");
 
             Interval diferencaHoras = new Interval(new DateTime(first.getKey()), new DateTime(last.getKey()));
             studentLine.append(diferencaHoras.toPeriod().getMinutes());
