@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,13 +53,28 @@ public class ProjectsToCSV {
         SimpleDateFormat sdfShow = new SimpleDateFormat("HH:mm:ss");
 
         ProjectsToCSV p = new ProjectsToCSV();
-        String retorno = p.getCSVDadosResumido(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
+//        String retorno = p.getCSVDadosResumido(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
+//        System.out.println(retorno);
 
-        System.out.println("**************************************************************************************");
-        System.out.println("**************************************************************************************");
-        System.out.println("**************************************************************************************");
-
-        System.out.println(retorno);
+        System.out.println(p.getTddTimelineCSV ());
+        
+    }
+    
+    public String getTddTimelineCSV () throws IOException, ParseException {
+        
+        StringBuilder fileContent = new StringBuilder();
+        
+        fileContent.append("RA; DATA; STAGE;").append("\n");
+        
+        for (Entry<String, Map<Date, String>> projectsTddStage : parseAllProjectsTddStage("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/").entrySet()) {
+            for (Entry<Date, String> projectStage : projectsTddStage.getValue().entrySet()) {
+                fileContent.append(projectsTddStage.getKey()).append(";");
+                fileContent.append(sdfShow.format(projectStage.getKey())).append(";");
+                fileContent.append(projectStage.getValue().trim()).append(";").append("\n");
+            }
+        }
+        
+        return fileContent.toString();
     }
 
     public String getCSVDadosResumido(File file) throws IOException, ParseException {
@@ -70,11 +86,9 @@ public class ProjectsToCSV {
 
             projectFolder = file.getAbsolutePath();
 
-            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = readProjectByRootPath(projectFolder);
+            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = parseAllProjects(projectFolder);
 
-            fileContent.append("RA; HORÁRIO INICIO RED; HORÁRIO FIM RED; TEMPO RED; QNT CASOS DE TESTE RED; QNT CASOS DE TESTE PASSANDO RED; QNT CASOS DE TESTE FALHANDO RED; COBERTURA DE CLASS RED; COBERTURA DE METODO RED; COBERTURA DE LINHAS RED; COBERTURA DE INSTRUCAOES RED; COBERTURA DE RAMOS RED; " + 
-                    "HORÁRIO INICIO GREEN; HORÁRIO FIM GREEN; TEMPO GREEN; QNT CASOS DE TESTE GREEN; QNT CASOS DE TESTE PASSANDO GREEN; QNT CASOS DE TESTE FALHANDO GREEN; COBERTURA DE CLASS GREEN; COBERTURA DE METODO GREEN; COBERTURA DE LINHAS GREEN; COBERTURA DE INSTRUCAOES GREEN; COBERTURA DE RAMOS GREEN; " +
-                    "HORÁRIO INICIO REFACTOR; HORÁRIO FIM REFACTOR; TEMPO REFACTOR; QNT CASOS DE TESTE REFACTOR; QNT CASOS DE TESTE PASSANDO REFACTOR; QNT CASOS DE TESTE FALHANDO REFACTOR; COBERTURA DE CLASS REFACTOR; COBERTURA DE METODO REFACTOR; COBERTURA DE LINHAS REFACTOR; COBERTURA DE INSTRUCAOES REFACTOR; COBERTURA DE RAMOS REFACTOR; \n");
+            fileContent.append("RA; NOME; ITERACAO; ESTAGIO TDD; HORÁRIO INICIO; HORÁRIO FIM; TEMPO; QNT CASOS DE TESTE; QNT CASOS DE TESTE PASSANDO; QNT CASOS DE TESTE FALHANDO; COBERTURA DE CLASS; COBERTURA DE METODO; COBERTURA DE LINHAS; COBERTURA DE INSTRUCOES; COBERTURA DE RAMOS; \n");
 
             for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
 
@@ -134,34 +148,31 @@ public class ProjectsToCSV {
                             sixthIteration.put(e.getKey(), e.getValue());
 
                         });
-                
-                fileContent.append("'" + propAluno.getCurrentStudent().getId() + "'; '" + propAluno.getCurrentStudent().getName() + "';");
 
-                fileContent.append(getIterationValues(firstIteration, "RED"));
-                fileContent.append(getIterationValues(firstIteration, "GREEN"));
-                fileContent.append(getIterationValues(firstIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(firstIteration, 1, "RED", propAluno));
+                fileContent.append(getIterationValues(firstIteration, 1, "GREEN", propAluno));
+                fileContent.append(getIterationValues(firstIteration, 1, "REFACTOR", propAluno));
 
-                fileContent.append(getIterationValues(secondIteration, "RED"));
-                fileContent.append(getIterationValues(secondIteration, "GREEN"));
-                fileContent.append(getIterationValues(secondIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(secondIteration, 2, "RED", propAluno));
+                fileContent.append(getIterationValues(secondIteration, 2, "GREEN", propAluno));
+                fileContent.append(getIterationValues(secondIteration, 2, "REFACTOR", propAluno));
 
-                fileContent.append(getIterationValues(thirdteration, "RED"));
-                fileContent.append(getIterationValues(thirdteration, "GREEN"));
-                fileContent.append(getIterationValues(thirdteration, "REFACTOR"));
+                fileContent.append(getIterationValues(thirdteration, 3, "RED", propAluno));
+                fileContent.append(getIterationValues(thirdteration, 3, "GREEN", propAluno));
+                fileContent.append(getIterationValues(thirdteration, 3, "REFACTOR", propAluno));
 
-                fileContent.append(getIterationValues(fourthIteration, "RED"));
-                fileContent.append(getIterationValues(fourthIteration, "GREEN"));
-                fileContent.append(getIterationValues(fourthIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(fourthIteration, 4, "RED", propAluno));
+                fileContent.append(getIterationValues(fourthIteration, 4, "GREEN", propAluno));
+                fileContent.append(getIterationValues(fourthIteration, 4, "REFACTOR", propAluno));
 
-                fileContent.append(getIterationValues(fifithIteration, "RED"));
-                fileContent.append(getIterationValues(fifithIteration, "GREEN"));
-                fileContent.append(getIterationValues(fifithIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(fifithIteration, 5, "RED", propAluno));
+                fileContent.append(getIterationValues(fifithIteration, 5, "GREEN", propAluno));
+                fileContent.append(getIterationValues(fifithIteration, 5, "REFACTOR", propAluno));
 
-                fileContent.append(getIterationValues(sixthIteration, "RED"));
-                fileContent.append(getIterationValues(sixthIteration, "GREEN"));
-                fileContent.append(getIterationValues(sixthIteration, "REFACTOR"));
+                fileContent.append(getIterationValues(sixthIteration, 6, "RED", propAluno));
+                fileContent.append(getIterationValues(sixthIteration, 6, "GREEN", propAluno));
+                fileContent.append(getIterationValues(sixthIteration, 6, "REFACTOR", propAluno));
 
-                fileContent.append("\n");
             }
 
         } else {
@@ -181,7 +192,7 @@ public class ProjectsToCSV {
 
             projectFolder = file.getAbsolutePath();
 
-            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = readProjectByRootPath(projectFolder);
+            Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = parseAllProjects(projectFolder);
 
             fileContent.append("RA; HORÁRIO; TDD STAGE; QNT. CASOS DE TESTE; PASSANDO; FALHANDO; CLASS; METHOD; LINE; INSTRUCTION; BRANCH; \n");
 
@@ -264,21 +275,45 @@ public class ProjectsToCSV {
         return fileContent.toString();
     }
 
-    public Map<String, Map<Date, TDDCriteriaProjectSnapshot>> readProjectByRootPath(String rootPath) throws IOException, ParseException {
-        Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeline = new HashMap<>();
+    public Map<String, Map<Date, TDDCriteriaProjectSnapshot>> parseAllProjects(String rootPath) throws IOException, ParseException {
+
+        Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeline = new TreeMap<>();
+        
+        for (File folder : getProjectRootFolders(rootPath)) {
+            System.out.println(" ----------------------------------- ");
+            System.out.println(" * " + folder.getName());
+            Map<Date, TDDCriteriaProjectSnapshot> timeline = readProject(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim());
+
+            studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);
+        }
+        
+        return studentsTimeline;
+    }
+    
+    public Map<String, Map<Date, String>> parseAllProjectsTddStage (String rootPath) throws IOException, ParseException {
+        
+        Map<String, Map<Date, String>> tddStageStudentTimeline = new TreeMap<>();
+        
+        for (File folder : getProjectRootFolders(rootPath)) {
+            tddStageStudentTimeline.put(folder.getName().split("-")[0].trim(), getTDDTimeline(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim()));
+        }
+        
+        return tddStageStudentTimeline;
+    }
+
+    public List<File> getProjectRootFolders(String rootPath) throws IOException, ParseException {
+
+        List<File> folders = new ArrayList<>();
 
         for (File folder : Arrays.asList(new File(rootPath).listFiles())) {
             if (folder.isDirectory() && new File(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim()).exists()) {
 
-                System.out.println(" ----------------------------------- ");
-                System.out.println(" * " + folder.getName());
-                Map<Date, TDDCriteriaProjectSnapshot> timeline = readProject(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim());
+                folders.add(folder);
 
-                studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);
             }
         }
 
-        return studentsTimeline;
+        return folders;
     }
 
     public Map<Date, TDDCriteriaProjectSnapshot> readProject(String projectFolder) throws IOException, ParseException {
@@ -344,21 +379,26 @@ public class ProjectsToCSV {
         return 100 * especificos / (double) total;
     }
 
-    public String getIterationValues(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
-        
+    public String getIterationValues(Map<Date, TDDCriteriaProjectSnapshot> iteration, Integer iteracao, String tddStage, TDDCriteriaProjectProperties propAluno) {
+
         StringBuilder studentLine = new StringBuilder();
+
+        studentLine.append(propAluno.getCurrentStudent().getId()).append("; ").append(propAluno.getCurrentStudent().getName()).append(";");
+        studentLine.append(iteracao).append(";");
+        studentLine.append(tddStage).append(";");
 
         if (iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).count() > 0) {
 
             Entry<Date, TDDCriteriaProjectSnapshot> first = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).findFirst().get();
             Entry<Date, TDDCriteriaProjectSnapshot> last = iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).reduce((a, b) -> b).get();
 
-            studentLine.append("'" + sdfShow.format(first.getKey()) + "';");
-            studentLine.append("'" + sdfShow.format(last.getKey())+ "';");
+            studentLine.append(sdfShow.format(first.getKey())).append(";");
+            studentLine.append(sdfShow.format(last.getKey())).append(";");
 
             Interval diferencaHoras = new Interval(new DateTime(first.getKey()), new DateTime(last.getKey()));
             studentLine.append(diferencaHoras.toPeriod().getMinutes());
-            
+            studentLine.append(";");
+
             if (last.getValue().getjUnitSession() != null) {
                 //Qnt Casos de Teste 
                 studentLine.append(last.getValue().getjUnitSession().getTestCases().size());
@@ -368,16 +408,17 @@ public class ProjectsToCSV {
                 studentLine.append(last.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
                 studentLine.append(";");
 
-                //Qnt Casos de Teste FALHANDO
                 studentLine.append(last.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
                 studentLine.append(";");
+
             } else {
-                studentLine.append("0;0;0;");
+                studentLine.append("s/r;s/r;s/r;");
             }
-            
+
             if (last.getValue().getEclemmaSession() != null) {
                 last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    double classCoverage = regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                    studentLine.append(classCoverage);
                     studentLine.append(";");
                 });
 
@@ -397,18 +438,38 @@ public class ProjectsToCSV {
                 });
 
                 last.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    studentLine.append(regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered()));
+                    double branchCoverage = regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
+                    studentLine.append(branchCoverage);
                     studentLine.append(";");
                 });
             } else {
-                studentLine.append("0;0;0;0;0;");
+                studentLine.append("s/r;s/r;s/r;s/r;s/r;");
             }
 
         } else {
-            //System.out.println("Não foi encontrado um estágio " + tddStage);
+            studentLine.append("s/r;s/r;s/r;s/r;s/r;s/r;s/r;s/r;s/r;s/r;s/r;");
         }
 
+        studentLine.append(" \n");
+
         return studentLine.toString();
+    }
+
+    public Map<Date, String> getTDDTimeline(String projectFolder) throws IOException, ParseException {
+
+        Map<Date, String> tddStageTimeline = new TreeMap<>();
+
+        List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
+        for (String lnTddStages : tddStages) {
+
+            if (!lnTddStages.trim().isEmpty()) {
+
+                tddStageTimeline.put(sdf.parse(lnTddStages.substring(0, 19)), lnTddStages.split(":")[1]);
+
+            }
+        }
+        
+        return tddStageTimeline;
     }
 
 }
