@@ -12,6 +12,10 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +40,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.util.StringConverter;
+import net.bhpachulski.tddcriteria.charts.DateAxis310;
 import net.bhpachulski.tddcriteria.model.Eclemma.Report;
 import net.bhpachulski.tddcriteria.model.Eclemma.Type;
 import net.bhpachulski.tddcriteria.model.TDDCriteriaProjectProperties;
@@ -48,22 +53,22 @@ public class FXMLController implements Initializable {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
     SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    private LineChartWithMarkers<String, Number> lineChart;
-    private LineChartWithMarkers<String, Number> lineChartCoverage;
+    private LineChartWithMarkers<LocalDateTime, Number> lineChart;
+    private LineChartWithMarkers<LocalDateTime, Number> lineChartCoverage;
 
-    private XYChart.Data<String, Number> testVerticalMarkerFirstIteration;
-    private XYChart.Data<String, Number> testVerticalMarkerSecondIteration;
-    private XYChart.Data<String, Number> testVerticalMarkerThirdIteration;
-    private XYChart.Data<String, Number> testVerticalMarkerFourthIteration;
-    private XYChart.Data<String, Number> testVerticalMarkerFifthIteration;
-    private XYChart.Data<String, Number> testVerticalMarkerSixthIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFirstIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerSecondIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerThirdIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFourthIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFifthIteration;
+    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerSixthIteration;
 
-    private XYChart.Data<String, Number> coverageVerticalMarkerFirstIteration;
-    private XYChart.Data<String, Number> coverageVerticalMarkerSecondIteration;
-    private XYChart.Data<String, Number> coverageVerticalMarkerThirdIteration;
-    private XYChart.Data<String, Number> coverageVerticalMarkerFourthIteration;
-    private XYChart.Data<String, Number> coverageVerticalMarkerFifthIteration;
-    private XYChart.Data<String, Number> coverageVerticalMarkerSixthIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFirstIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerSecondIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerThirdIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFourthIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFifthIteration;
+    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerSixthIteration;
 
     private ChangeListener<Date> cbListenerIteracao1;
     private ChangeListener<Date> cbListenerIteracao2;
@@ -396,12 +401,25 @@ public class FXMLController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        final StringConverter<LocalDateTime> STRING_CONVERTER = new StringConverter<LocalDateTime>() {
+            @Override public String toString(LocalDateTime localDateTime) {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy\nHH:mm:ss");
+                return dtf.format(localDateTime);
+            }
+            @Override public LocalDateTime fromString(String s) {
+                return LocalDateTime.parse(s);
+            }
+        };  
 
         module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         xmlMapper = new XmlMapper(module);
 
-        lineChart = new LineChartWithMarkers<>(new CategoryAxis(), new NumberAxis());
+        DateAxis310 lineChartXAxis = new DateAxis310();
+        lineChartXAxis.setTickLabelFormatter(STRING_CONVERTER);
+        
+        lineChart = new LineChartWithMarkers<>(lineChartXAxis, new NumberAxis());
         lineChart.setLayoutX(0.0);
         lineChart.setLayoutY(5.0);
 
@@ -411,7 +429,9 @@ public class FXMLController implements Initializable {
 
         pane.getChildren().add(lineChart);
 
-        lineChartCoverage = new LineChartWithMarkers<>(new CategoryAxis(), new NumberAxis());
+        DateAxis310 lineChartCoverageXAxis = new DateAxis310();
+        lineChartCoverageXAxis.setTickLabelFormatter(STRING_CONVERTER);
+        lineChartCoverage = new LineChartWithMarkers<>(lineChartCoverageXAxis, new NumberAxis());
         lineChartCoverage.setLayoutX(5.0);
         lineChartCoverage.setLayoutY(305.0);
 
@@ -449,8 +469,9 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setFirstIteration(newValue);
-                testVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
-                coverageVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+                
+                testVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFirstIteration().getTime())), 5);
+                coverageVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFirstIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerFirstIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFirstIteration);
             }
@@ -468,8 +489,8 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setSecondIteration(newValue);
-                testVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
-                coverageVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+                testVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSecondIteration().getTime())), 5);
+                coverageVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSecondIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerSecondIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSecondIteration);
             }
@@ -487,8 +508,8 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setThirdIteration(newValue);
-                testVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
-                coverageVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+                testVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getThirdIteration().getTime())), 5);
+                coverageVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getThirdIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerThirdIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerThirdIteration);
             }
@@ -506,8 +527,8 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setFourthIteration(newValue);
-                testVerticalMarkerFourthIteration = new XYChart.Data<>(sdfShow.format(prop.getFourthIteration()), 5);
-                coverageVerticalMarkerFourthIteration = new XYChart.Data<>(sdfShow.format(prop.getFourthIteration()), 5);
+                testVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFourthIteration().getTime())), 5);
+                coverageVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFourthIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerFourthIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFourthIteration);
             }
@@ -525,8 +546,8 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setFifthIteration(newValue);
-                testVerticalMarkerFifthIteration = new XYChart.Data<>(sdfShow.format(prop.getFifthIteration()), 5);
-                coverageVerticalMarkerFifthIteration = new XYChart.Data<>(sdfShow.format(prop.getFifthIteration()), 5);
+                testVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFifthIteration().getTime())), 5);
+                coverageVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFifthIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerFifthIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFifthIteration);
             }
@@ -544,8 +565,8 @@ public class FXMLController implements Initializable {
                 }
 
                 prop.setSixthIteration(newValue);
-                testVerticalMarkerSixthIteration = new XYChart.Data<>(sdfShow.format(prop.getSixthIteration()), 5);
-                coverageVerticalMarkerSixthIteration = new XYChart.Data<>(sdfShow.format(prop.getSixthIteration()), 5);
+                testVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSixthIteration().getTime())), 5);
+                coverageVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSixthIteration().getTime())), 5);
                 lineChart.addVerticalValueMarker(testVerticalMarkerSixthIteration);
                 lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSixthIteration);
             }
@@ -622,20 +643,20 @@ public class FXMLController implements Initializable {
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                    lnClass.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), classCoverage));
+                    lnClass.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), classCoverage));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    lnMethod.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                    lnMethod.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    lnLine.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                    lnLine.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double instructionCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                    lnInstruction.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), instructionCoverage));
+                    lnInstruction.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), instructionCoverage));
 
                     coverageTooltip.append(" * Instruction: ");
                     coverageTooltip.append(df.format(instructionCoverage));
@@ -645,7 +666,7 @@ public class FXMLController implements Initializable {
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double branchCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
 
-                    lnBranch.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), branchCoverage));
+                    lnBranch.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), branchCoverage));
 
                     coverageTooltip.append(" * Branch: ");
                     coverageTooltip.append(df.format(branchCoverage));
@@ -654,9 +675,9 @@ public class FXMLController implements Initializable {
 
                 studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
 
-                    //JUNIT
+                //JUNIT
                 //Qnt Casos de Teste                     
-                XYChart.Data qntCasosTesteData = new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                XYChart.Data qntCasosTesteData = new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
                 qntCasosTesteData.setNode(new HoveredThresholdNode(
                         studentTimeLine.getValue().getTddStage()
                         + coverageTooltip.toString()
@@ -665,10 +686,10 @@ public class FXMLController implements Initializable {
                 lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
                 //Qnt Casos de Teste PASSANDO
-                lnQntCasosDeTestePassando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
+                lnQntCasosDeTestePassando.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
 
                 //Qnt Casos de Teste FALHANDO
-                lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(sdfShow.format(studentTimeLine.getKey()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
+                lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
 
             }
         }
@@ -681,44 +702,44 @@ public class FXMLController implements Initializable {
         lineChartCoverage.getData().addAll(lnInstruction, lnBranch, lnLine, lnMethod, lnClass);
         lineChartCoverage.setCursor(Cursor.CROSSHAIR);
 
-        if (prop.getFirstIteration() != null) {
-            testVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
-            coverageVerticalMarkerFirstIteration = new XYChart.Data<>(sdfShow.format(prop.getFirstIteration()), 5);
+        if (prop.getFirstIteration() != null) {            
+            testVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFirstIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFirstIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerFirstIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFirstIteration);
         }
 
         if (prop.getSecondIteration() != null) {
-            testVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
-            coverageVerticalMarkerSecondIteration = new XYChart.Data<>(sdfShow.format(prop.getSecondIteration()), 5);
+            testVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getSecondIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getSecondIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerSecondIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSecondIteration);
         }
 
         if (prop.getThirdIteration() != null) {
-            testVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
-            coverageVerticalMarkerThirdIteration = new XYChart.Data<>(sdfShow.format(prop.getThirdIteration()), 5);
+            testVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getThirdIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getThirdIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerThirdIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerThirdIteration);
         }
 
         if (prop.getFourthIteration() != null) {
-            testVerticalMarkerFourthIteration = new XYChart.Data<>(sdfShow.format(prop.getFourthIteration()), 5);
-            coverageVerticalMarkerFourthIteration = new XYChart.Data<>(sdfShow.format(prop.getFourthIteration()), 5);
+            testVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFourthIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFourthIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerFourthIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFourthIteration);
         }
 
         if (prop.getFifthIteration() != null) {
-            testVerticalMarkerFifthIteration = new XYChart.Data<>(sdfShow.format(prop.getFifthIteration()), 5);
-            coverageVerticalMarkerFifthIteration = new XYChart.Data<>(sdfShow.format(prop.getFifthIteration()), 5);
+            testVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFifthIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getFifthIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerFifthIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFifthIteration);
         }
 
         if (prop.getSixthIteration() != null) {
-            testVerticalMarkerSixthIteration = new XYChart.Data<>(sdfShow.format(prop.getSixthIteration()), 5);
-            coverageVerticalMarkerSixthIteration = new XYChart.Data<>(sdfShow.format(prop.getSixthIteration()), 5);
+            testVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getSixthIteration().getTime()), ZoneId.systemDefault()), 5);
+            coverageVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(prop.getSixthIteration().getTime()), ZoneId.systemDefault()), 5);
             lineChart.addVerticalValueMarker(testVerticalMarkerSixthIteration);
             lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSixthIteration);
         }
