@@ -7,13 +7,18 @@
     -fx-effect: null;
 }*/
  
-/*.default-color0.chart-series-line { -fx-stroke: #e9967a; }
-.default-color1.chart-series-line { -fx-stroke: #f0e68c; }
-.default-color2.chart-series-line { -fx-stroke: #dda0dd; }*/
+.default-color0.chart-series-line { -fx-stroke: #000000; -fx-stroke-width: 1px; }
+.default-color1.chart-series-line { -fx-stroke: #006400; -fx-stroke-width: 1px; }
+.default-color2.chart-series-line { -fx-stroke: #B22222; -fx-stroke-width: 1px; }
+.default-color3.chart-series-line { -fx-stroke: #8B008B; -fx-stroke-width: 1px; }
+.default-color4.chart-series-line { -fx-stroke: #00CED1; -fx-stroke-width: 1px; }
+
  
-/*.default-color0.chart-line-symbol { -fx-background-color: #e9967a, white; -fx-stroke-width: 1px; }
-.default-color1.chart-line-symbol { -fx-background-color: #f0e68c, white; -fx-stroke-width: 1px; }
-.default-color2.chart-line-symbol { -fx-background-color: #dda0dd, white; -fx-stroke-width: 1px; }*/
+.default-color0.chart-line-symbol { -fx-background-color: #000000, white; -fx-stroke-width: 1px; }
+.default-color1.chart-line-symbol { -fx-background-color: #006400, white; -fx-stroke-width: 1px; }
+.default-color2.chart-line-symbol { -fx-background-color: #B22222, white; -fx-stroke-width: 1px; }
+.default-color3.chart-line-symbol { -fx-background-color: #8B008B, white; -fx-stroke-width: 1px; }
+.default-color4.chart-line-symbol { -fx-background-color: #00CED1, white; -fx-stroke-width: 1px; }
 
 /*.chart-legend-item-symbol {*/
    /*-fx-background-radius: 0;*/
@@ -24,3 +29,21 @@
     -fx-background-color: #000000, white; 
     -fx-stroke-width: 0px;
 }*/
+
+/*.chart-line-symbol {
+    -fx-background-color : CHART_COLOR_1, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 7px, 5px;
+    -fx-padding          : 7px;
+}
+.chart-line-symbol:hover {
+    -fx-effect: dropshadow(two-pass-box, white, 10, 0, 0, 0);
+}
+.chart-series-line {
+    -fx-stroke      : CHART_COLOR_1;
+    -fx-stroke-width: 4px;
+}
+.default-color0.chart-line-symbol { -fx-background-color: CHART_COLOR_1, white; }
+
+.default-color0.chart-series-line { -fx-stroke: CHART_COLOR_1; }*/
+
