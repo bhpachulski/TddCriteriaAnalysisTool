@@ -52,6 +52,8 @@ public class FXMLController implements Initializable {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
     SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private LineChartWithMarkers<LocalDateTime, Number> lineChart;
     private LineChartWithMarkers<LocalDateTime, Number> lineChartCoverage;
@@ -634,12 +636,9 @@ public class FXMLController implements Initializable {
                 //RA
                 id.setText(String.valueOf(prop.getCurrentStudent().getId()));
 
-                //HORA
-//                System.out.print(sdfShow.format(studentTimeLine.getKey()));
-                //TDD STAGE
-//                System.out.print(studentTimeLine.getValue().getTddStage());    
                 StringBuilder coverageTooltip = new StringBuilder();
-                coverageTooltip.append("\n");
+                coverageTooltip.append(studentTimeLine.getValue().getTddStage()).append("\n"); 
+                coverageTooltip.append("(").append(sdfShow.format(studentTimeLine.getKey())).append(")").append("\n");
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
@@ -678,10 +677,8 @@ public class FXMLController implements Initializable {
                 //JUNIT
                 //Qnt Casos de Teste                     
                 XYChart.Data qntCasosTesteData = new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
-                qntCasosTesteData.setNode(new HoveredThresholdNode(
-                        studentTimeLine.getValue().getTddStage()
-                        + coverageTooltip.toString()
-                ));
+                
+                qntCasosTesteData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
 
                 lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
