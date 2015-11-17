@@ -126,6 +126,9 @@ public class FXMLController implements Initializable {
 
     @FXML
     private CheckBox checkClass;
+    
+    @FXML
+    private CheckBox checkTimeLineFake;
 
     @FXML
     private ComboBox<Date> cbIteracao1;
@@ -624,6 +627,8 @@ public class FXMLController implements Initializable {
         lnComplexity.setName("Complexity Coverage");
         lnMethod.setName("Method Coverage");
         lnClass.setName("Class Coverage");
+        
+        LocalDateTime fakeDataHoraStudentTimeline = LocalDateTime.now();
 
         for (Map.Entry<Date, TDDCriteriaProjectSnapshot> studentTimeLine : projectTimeLine.entrySet()) {
 
@@ -631,6 +636,15 @@ public class FXMLController implements Initializable {
 
                 if ((studentTimeLine.getValue().getjUnitSession() == null) || (studentTimeLine.getValue().getEclemmaSession() == null) || (studentTimeLine.getValue().getTddStage().isEmpty())) {
                     continue;
+                }
+                
+                LocalDateTime dataHoraStudentTimeline;
+                
+                if (checkTimeLineFake.isSelected()) {
+                    fakeDataHoraStudentTimeline = fakeDataHoraStudentTimeline.plusMinutes(5);
+                    dataHoraStudentTimeline = fakeDataHoraStudentTimeline;                    
+                } else {
+                    dataHoraStudentTimeline = LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault());
                 }
 
                 //RA
@@ -642,20 +656,20 @@ public class FXMLController implements Initializable {
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double classCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                    lnClass.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), classCoverage));
+                    lnClass.getData().add(new XYChart.Data(dataHoraStudentTimeline, classCoverage));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.METHOD).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    lnMethod.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                    lnMethod.getData().add(new XYChart.Data(dataHoraStudentTimeline, this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.LINE).collect(Collectors.toList()).stream().forEach((counter) -> {
-                    lnLine.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
+                    lnLine.getData().add(new XYChart.Data(dataHoraStudentTimeline, this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered())));
                 });
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.INSTRUCTION).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double instructionCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
-                    lnInstruction.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), instructionCoverage));
+                    lnInstruction.getData().add(new XYChart.Data(dataHoraStudentTimeline, instructionCoverage));
 
                     coverageTooltip.append(" * Instruction: ");
                     coverageTooltip.append(df.format(instructionCoverage));
@@ -665,7 +679,7 @@ public class FXMLController implements Initializable {
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.BRANCH).collect(Collectors.toList()).stream().forEach((counter) -> {
                     Double branchCoverage = this.regraDeTres(counter.getMissed() + counter.getCovered(), counter.getCovered());
 
-                    lnBranch.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), branchCoverage));
+                    lnBranch.getData().add(new XYChart.Data(dataHoraStudentTimeline, branchCoverage));
 
                     coverageTooltip.append(" * Branch: ");
                     coverageTooltip.append(df.format(branchCoverage));
@@ -676,18 +690,24 @@ public class FXMLController implements Initializable {
 
                 //JUNIT
                 //Qnt Casos de Teste                     
-                XYChart.Data qntCasosTesteData = new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                XYChart.Data qntCasosTesteData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().size());
+                coverageTooltip.append(" * CT: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().size()).append(" | ");
                 
-                qntCasosTesteData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
-
                 lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
                 //Qnt Casos de Teste PASSANDO
-                lnQntCasosDeTestePassando.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()));
-
+                XYChart.Data qntCasosTestePassandoData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
+                lnQntCasosDeTestePassando.getData().add(qntCasosTestePassandoData);
+                coverageTooltip.append("CT P: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()).append(" | ");
+                
                 //Qnt Casos de Teste FALHANDO
-                lnQntCasosDeTesteFalhando.getData().add(new XYChart.Data(LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault()), studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count()));
-
+                XYChart.Data qntCasosTesteFalhandoData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
+                lnQntCasosDeTesteFalhando.getData().add(qntCasosTesteFalhandoData);
+                coverageTooltip.append("CT F: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
+                
+                qntCasosTesteData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
+                qntCasosTestePassandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
+                qntCasosTesteFalhandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
             }
         }
 
