@@ -43,10 +43,14 @@ import javafx.util.StringConverter;
 import net.bhpachulski.tddcriteria.charts.DateAxis310;
 import net.bhpachulski.tddcriteria.model.Eclemma.Report;
 import net.bhpachulski.tddcriteria.model.Eclemma.Type;
+import net.bhpachulski.tddcriteria.model.ExperimentalGroup;
 import net.bhpachulski.tddcriteria.model.TDDCriteriaProjectProperties;
 import net.bhpachulski.tddcriteria.model.TestSuiteSession;
 import net.bhpachulski.tddcriteria.model.analysis.TDDCriteriaProjectSnapshot;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
+import org.apache.commons.math3.stat.ranking.NaNStrategy;
+import org.apache.commons.math3.stat.ranking.TiesStrategy;
 
 public class FXMLController implements Initializable {
 
@@ -81,6 +85,8 @@ public class FXMLController implements Initializable {
     private ChangeListener<Date> cbListenerIteracao4;
     private ChangeListener<Date> cbListenerIteracao5;
     private ChangeListener<Date> cbListenerIteracao6;
+    
+    private ChangeListener<ExperimentalGroup> cbListenerExperimentalGroup;
 
     DecimalFormat df = new DecimalFormat("#.00");
 
@@ -91,6 +97,8 @@ public class FXMLController implements Initializable {
     private File fProp;
 
     private StringConverter<Date> dateConverter;
+    
+    private StringConverter<ExperimentalGroup> experimentalGroupConverter;
 
     private static final String propFilePath = "/tddCriteria/tddCriteriaProjectProperties.xml";
     private static final String jUnitFolderPath = "/tddCriteria/junitTrack/";
@@ -150,6 +158,9 @@ public class FXMLController implements Initializable {
 
     @FXML
     private ComboBox<Date> cbIteracao6;
+    
+    @FXML
+    private ComboBox<ExperimentalGroup> cbExperimentalGroup;
 
     @FXML
     private Label id;
@@ -419,7 +430,7 @@ public class FXMLController implements Initializable {
                 return LocalDateTime.parse(s);
             }
         };  
-
+        
         module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         xmlMapper = new XmlMapper(module);
@@ -429,10 +440,10 @@ public class FXMLController implements Initializable {
         
         lineChart = new LineChartWithMarkers<>(lineChartXAxis, new NumberAxis());
         lineChart.setLayoutX(0.0);
-        lineChart.setLayoutY(5.0);
+        lineChart.setLayoutY(0.0);
 
         lineChart.setPrefWidth(1000.0);
-        lineChart.setPrefHeight(300.0);
+        lineChart.setPrefHeight(280.0);
         lineChart.autosize();
 
         pane.getChildren().add(lineChart);
@@ -441,10 +452,10 @@ public class FXMLController implements Initializable {
         lineChartCoverageXAxis.setTickLabelFormatter(STRING_CONVERTER);
         lineChartCoverage = new LineChartWithMarkers<>(lineChartCoverageXAxis, new NumberAxis());
         lineChartCoverage.setLayoutX(5.0);
-        lineChartCoverage.setLayoutY(305.0);
+        lineChartCoverage.setLayoutY(280.0);
 
         lineChartCoverage.setPrefWidth(1000.0);
-        lineChartCoverage.setPrefHeight(300.0);
+        lineChartCoverage.setPrefHeight(280.0);
         lineChartCoverage.autosize();
 
         pane.getChildren().add(lineChartCoverage);
@@ -463,6 +474,18 @@ public class FXMLController implements Initializable {
                 } catch (ParseException ex) {
                     return null;
                 }
+            }
+        };
+        
+        experimentalGroupConverter = new StringConverter<ExperimentalGroup>() {
+            @Override
+            public String toString(ExperimentalGroup object) {
+                return object.toString();
+            }
+
+            @Override
+            public ExperimentalGroup fromString(String string) {
+                return ExperimentalGroup.CONTROL;
             }
         };
 
@@ -580,6 +603,16 @@ public class FXMLController implements Initializable {
             }
 
         };
+        
+        cbListenerExperimentalGroup = new ChangeListener<ExperimentalGroup>() {
+            @Override
+            public void changed(ObservableValue<? extends ExperimentalGroup> observable, ExperimentalGroup oldValue, ExperimentalGroup newValue) {
+                
+                System.out.println(newValue);                
+                prop.getCurrentStudent().setExperimentalType(newValue);
+                
+            }
+        };
 
         initComboIteracao();
 
@@ -592,7 +625,9 @@ public class FXMLController implements Initializable {
         cbIteracao3.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao3);
         cbIteracao4.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao4);
         cbIteracao5.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao5);
-        cbIteracao6.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao6);
+        cbIteracao6.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao6);        
+        
+        cbExperimentalGroup.getSelectionModel().selectedItemProperty().removeListener(cbListenerExperimentalGroup);        
 
         cbIteracao1.setDisable(true);
         cbIteracao2.setDisable(true);
@@ -600,6 +635,8 @@ public class FXMLController implements Initializable {
         cbIteracao4.setDisable(true);
         cbIteracao5.setDisable(true);
         cbIteracao6.setDisable(true);
+        
+        cbExperimentalGroup.setDisable(true);
 
         cbIteracao1.setConverter(dateConverter);
         cbIteracao2.setConverter(dateConverter);
@@ -607,13 +644,17 @@ public class FXMLController implements Initializable {
         cbIteracao4.setConverter(dateConverter);
         cbIteracao5.setConverter(dateConverter);
         cbIteracao6.setConverter(dateConverter);
+        
+        cbExperimentalGroup.setConverter(experimentalGroupConverter);
 
         cbIteracao1.getItems().clear();
         cbIteracao2.getItems().clear();
         cbIteracao3.getItems().clear();
         cbIteracao4.getItems().clear();
         cbIteracao5.getItems().clear();
-        cbIteracao6.getItems().clear();
+        cbIteracao6.getItems().clear();        
+        
+        cbExperimentalGroup.getItems().clear();
     }
 
     public void lerArquivos() throws IOException, ParseException {
@@ -749,6 +790,9 @@ public class FXMLController implements Initializable {
         cbIteracao4.getItems().addAll(projectTimeLine.keySet());
         cbIteracao5.getItems().addAll(projectTimeLine.keySet());
         cbIteracao6.getItems().addAll(projectTimeLine.keySet());
+        
+        cbExperimentalGroup.getItems().add(ExperimentalGroup.INTERVENTION);
+        cbExperimentalGroup.getItems().add(ExperimentalGroup.CONTROL);
 
         cbIteracao1.getSelectionModel().select(prop.getFirstIteration());
         cbIteracao2.getSelectionModel().select(prop.getSecondIteration());
@@ -756,6 +800,8 @@ public class FXMLController implements Initializable {
         cbIteracao4.getSelectionModel().select(prop.getFourthIteration());
         cbIteracao5.getSelectionModel().select(prop.getFifthIteration());
         cbIteracao6.getSelectionModel().select(prop.getSixthIteration());
+        
+        cbExperimentalGroup.getSelectionModel().select(prop.getCurrentStudent().getExperimentalType());
 
         cbIteracao1.setDisable(false);
         cbIteracao2.setDisable(false);
@@ -763,6 +809,8 @@ public class FXMLController implements Initializable {
         cbIteracao4.setDisable(false);
         cbIteracao5.setDisable(false);
         cbIteracao6.setDisable(false);
+        
+        cbExperimentalGroup.setDisable(false);
 
         cbIteracao1.setVisibleRowCount(6);
         cbIteracao2.setVisibleRowCount(6);
@@ -777,6 +825,11 @@ public class FXMLController implements Initializable {
         cbIteracao4.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao4);
         cbIteracao5.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao5);
         cbIteracao6.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao6);
+        
+        cbExperimentalGroup.getSelectionModel().selectedItemProperty().addListener(cbListenerExperimentalGroup);
+        
+        
+        MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.AVERAGE);
 
     }
 
