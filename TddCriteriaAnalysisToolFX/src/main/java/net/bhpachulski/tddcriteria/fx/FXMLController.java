@@ -56,28 +56,14 @@ public class FXMLController implements Initializable {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
     SimpleDateFormat sdfShow = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private LineChartWithMarkers<LocalDateTime, Number> lineChart;
     private LineChartWithMarkers<LocalDateTime, Number> lineChartCoverage;
 
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarker;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarker;
-    
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFirstIteration;
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerSecondIteration;
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerThirdIteration;
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFourthIteration;
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerFifthIteration;
-    private XYChart.Data<LocalDateTime, Number> testVerticalMarkerSixthIteration;
-
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFirstIteration;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerSecondIteration;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerThirdIteration;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFourthIteration;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerFifthIteration;
-    private XYChart.Data<LocalDateTime, Number> coverageVerticalMarkerSixthIteration;
+    private Map<Integer, XYChart.Data<LocalDateTime, Number>> testVerticalMarker;
+    private Map<Integer, XYChart.Data<LocalDateTime, Number>> coverageVerticalMarker;
 
     private ChangeListener<Date> cbListenerIteracao1;
     private ChangeListener<Date> cbListenerIteracao2;
@@ -85,7 +71,7 @@ public class FXMLController implements Initializable {
     private ChangeListener<Date> cbListenerIteracao4;
     private ChangeListener<Date> cbListenerIteracao5;
     private ChangeListener<Date> cbListenerIteracao6;
-    
+
     private ChangeListener<ExperimentalGroup> cbListenerExperimentalGroup;
 
     DecimalFormat df = new DecimalFormat("#.00");
@@ -97,7 +83,7 @@ public class FXMLController implements Initializable {
     private File fProp;
 
     private StringConverter<Date> dateConverter;
-    
+
     private StringConverter<ExperimentalGroup> experimentalGroupConverter;
 
     private static final String propFilePath = "/tddCriteria/tddCriteriaProjectProperties.xml";
@@ -137,7 +123,7 @@ public class FXMLController implements Initializable {
 
     @FXML
     private CheckBox checkClass;
-    
+
     @FXML
     private CheckBox checkTimeLineFake;
 
@@ -158,7 +144,7 @@ public class FXMLController implements Initializable {
 
     @FXML
     private ComboBox<Date> cbIteracao6;
-    
+
     @FXML
     private ComboBox<ExperimentalGroup> cbExperimentalGroup;
 
@@ -420,24 +406,27 @@ public class FXMLController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+
         final StringConverter<LocalDateTime> STRING_CONVERTER = new StringConverter<LocalDateTime>() {
-            @Override public String toString(LocalDateTime localDateTime) {
+            @Override
+            public String toString(LocalDateTime localDateTime) {
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yy\nHH:mm:ss");
                 return dtf.format(localDateTime);
             }
-            @Override public LocalDateTime fromString(String s) {
+
+            @Override
+            public LocalDateTime fromString(String s) {
                 return LocalDateTime.parse(s);
             }
-        };  
-        
+        };
+
         module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         xmlMapper = new XmlMapper(module);
 
         DateAxis310 lineChartXAxis = new DateAxis310();
         lineChartXAxis.setTickLabelFormatter(STRING_CONVERTER);
-        
+
         lineChart = new LineChartWithMarkers<>(lineChartXAxis, new NumberAxis());
         lineChart.setLayoutX(0.0);
         lineChart.setLayoutY(0.0);
@@ -476,7 +465,7 @@ public class FXMLController implements Initializable {
                 }
             }
         };
-        
+
         experimentalGroupConverter = new StringConverter<ExperimentalGroup>() {
             @Override
             public String toString(ExperimentalGroup object) {
@@ -494,17 +483,7 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerFirstIteration != null && coverageVerticalMarkerFirstIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerFirstIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerFirstIteration);
-                }
-
-                prop.setFirstIteration(newValue);
-                
-                testVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFirstIteration().getTime())), 5);
-                coverageVerticalMarkerFirstIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFirstIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerFirstIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFirstIteration);
+                changeMarker(1, newValue);
             }
 
         };
@@ -514,16 +493,8 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerSecondIteration != null && coverageVerticalMarkerSecondIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerSecondIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerSecondIteration);
-                }
-
-                prop.setSecondIteration(newValue);
-                testVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSecondIteration().getTime())), 5);
-                coverageVerticalMarkerSecondIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSecondIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerSecondIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSecondIteration);
+                changeMarker(2, newValue);
+                
             }
 
         };
@@ -533,16 +504,7 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerThirdIteration != null && coverageVerticalMarkerThirdIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerThirdIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerThirdIteration);
-                }
-
-                prop.setThirdIteration(newValue);
-                testVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getThirdIteration().getTime())), 5);
-                coverageVerticalMarkerThirdIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getThirdIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerThirdIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerThirdIteration);
+                changeMarker(3, newValue);
             }
 
         };
@@ -552,16 +514,8 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerFourthIteration != null && coverageVerticalMarkerFourthIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerFourthIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerFourthIteration);
-                }
-
-                prop.setFourthIteration(newValue);
-                testVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFourthIteration().getTime())), 5);
-                coverageVerticalMarkerFourthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFourthIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerFourthIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFourthIteration);
+                changeMarker(4, newValue);
+                
             }
 
         };
@@ -571,16 +525,8 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerFifthIteration != null && coverageVerticalMarkerFifthIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerFifthIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerFifthIteration);
-                }
-
-                prop.setFifthIteration(newValue);
-                testVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFifthIteration().getTime())), 5);
-                coverageVerticalMarkerFifthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getFifthIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerFifthIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerFifthIteration);
+                changeMarker(5, newValue);
+                
             }
 
         };
@@ -590,27 +536,19 @@ public class FXMLController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
 
-                if (testVerticalMarkerSixthIteration != null && coverageVerticalMarkerSixthIteration != null) {
-                    lineChart.removeHorizontalValueMarker(testVerticalMarkerSixthIteration);
-                    lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarkerSixthIteration);
-                }
-
-                prop.setSixthIteration(newValue);
-                testVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSixthIteration().getTime())), 5);
-                coverageVerticalMarkerSixthIteration = new XYChart.Data<>(LocalDateTime.from(Instant.ofEpochMilli(prop.getSixthIteration().getTime())), 5);
-                lineChart.addVerticalValueMarker(testVerticalMarkerSixthIteration);
-                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarkerSixthIteration);
+                changeMarker(6, newValue);
+                
             }
 
         };
-        
+
         cbListenerExperimentalGroup = new ChangeListener<ExperimentalGroup>() {
             @Override
             public void changed(ObservableValue<? extends ExperimentalGroup> observable, ExperimentalGroup oldValue, ExperimentalGroup newValue) {
-                
-                System.out.println(newValue);                
+
+                System.out.println(newValue);
                 prop.getCurrentStudent().setExperimentalType(newValue);
-                
+
             }
         };
 
@@ -625,9 +563,9 @@ public class FXMLController implements Initializable {
         cbIteracao3.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao3);
         cbIteracao4.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao4);
         cbIteracao5.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao5);
-        cbIteracao6.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao6);        
-        
-        cbExperimentalGroup.getSelectionModel().selectedItemProperty().removeListener(cbListenerExperimentalGroup);        
+        cbIteracao6.getSelectionModel().selectedItemProperty().removeListener(cbListenerIteracao6);
+
+        cbExperimentalGroup.getSelectionModel().selectedItemProperty().removeListener(cbListenerExperimentalGroup);
 
         cbIteracao1.setDisable(true);
         cbIteracao2.setDisable(true);
@@ -635,7 +573,7 @@ public class FXMLController implements Initializable {
         cbIteracao4.setDisable(true);
         cbIteracao5.setDisable(true);
         cbIteracao6.setDisable(true);
-        
+
         cbExperimentalGroup.setDisable(true);
 
         cbIteracao1.setConverter(dateConverter);
@@ -644,7 +582,7 @@ public class FXMLController implements Initializable {
         cbIteracao4.setConverter(dateConverter);
         cbIteracao5.setConverter(dateConverter);
         cbIteracao6.setConverter(dateConverter);
-        
+
         cbExperimentalGroup.setConverter(experimentalGroupConverter);
 
         cbIteracao1.getItems().clear();
@@ -652,8 +590,8 @@ public class FXMLController implements Initializable {
         cbIteracao3.getItems().clear();
         cbIteracao4.getItems().clear();
         cbIteracao5.getItems().clear();
-        cbIteracao6.getItems().clear();        
-        
+        cbIteracao6.getItems().clear();
+
         cbExperimentalGroup.getItems().clear();
     }
 
@@ -671,15 +609,15 @@ public class FXMLController implements Initializable {
         lnComplexity.setName("Complexity Coverage");
         lnMethod.setName("Method Coverage");
         lnClass.setName("Class Coverage");
-        
+
         List<Date> iteracoes = new ArrayList<>();
-        iteracoes.add(prop.getFirstIteration());
-        iteracoes.add(prop.getSecondIteration());
-        iteracoes.add(prop.getThirdIteration());
-        iteracoes.add(prop.getFourthIteration());
-        iteracoes.add(prop.getFifthIteration());
-        iteracoes.add(prop.getSixthIteration());
-        
+        iteracoes.add(0, prop.getFirstIteration());
+        iteracoes.add(1, prop.getSecondIteration());
+        iteracoes.add(2, prop.getThirdIteration());
+        iteracoes.add(3, prop.getFourthIteration());
+        iteracoes.add(4, prop.getFifthIteration());
+        iteracoes.add(5, prop.getSixthIteration());
+
         LocalDateTime fakeDataHoraStudentTimeline = LocalDateTime.now();
 
         for (Map.Entry<Date, TDDCriteriaProjectSnapshot> studentTimeLine : projectTimeLine.entrySet()) {
@@ -689,27 +627,27 @@ public class FXMLController implements Initializable {
                 if ((studentTimeLine.getValue().getjUnitSession() == null) || (studentTimeLine.getValue().getEclemmaSession() == null) || (studentTimeLine.getValue().getTddStage().isEmpty())) {
                     continue;
                 }
-                
+
                 LocalDateTime dataHoraStudentTimeline;
-                
+
                 if (checkTimeLineFake.isSelected()) {
                     dataHoraStudentTimeline = LocalDateTime.ofInstant(Instant.ofEpochMilli(studentTimeLine.getKey().getTime()), ZoneId.systemDefault());
                 } else {
                     fakeDataHoraStudentTimeline = fakeDataHoraStudentTimeline.plusMinutes(5);
-                    dataHoraStudentTimeline = fakeDataHoraStudentTimeline;  
-                    
+                    dataHoraStudentTimeline = fakeDataHoraStudentTimeline;
+
                     if (iteracoes.contains(studentTimeLine.getKey())) {
                         iteracoes.remove(studentTimeLine.getKey());
                         iteracoes.add(Date.from(fakeDataHoraStudentTimeline.atZone(ZoneId.systemDefault()).toInstant()));
                     }
-                        
+
                 }
 
                 //RA
                 id.setText(String.valueOf(prop.getCurrentStudent().getId()));
 
                 StringBuilder coverageTooltip = new StringBuilder();
-                coverageTooltip.append(studentTimeLine.getValue().getTddStage()).append("\n"); 
+                coverageTooltip.append(studentTimeLine.getValue().getTddStage()).append("\n");
                 coverageTooltip.append("(").append(sdfShow.format(studentTimeLine.getKey())).append(")").append("\n");
 
                 studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(t -> t.getType() == Type.CLASS).collect(Collectors.toList()).stream().forEach((counter) -> {
@@ -750,19 +688,19 @@ public class FXMLController implements Initializable {
                 //Qnt Casos de Teste                     
                 XYChart.Data qntCasosTesteData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().size());
                 coverageTooltip.append(" * CT: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().size()).append(" | ");
-                
+
                 lnQntCasosDeTeste.getData().add(qntCasosTesteData);
 
                 //Qnt Casos de Teste PASSANDO
                 XYChart.Data qntCasosTestePassandoData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count());
                 lnQntCasosDeTestePassando.getData().add(qntCasosTestePassandoData);
                 coverageTooltip.append("CT P: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> !t.isFailed()).count()).append(" | ");
-                
+
                 //Qnt Casos de Teste FALHANDO
                 XYChart.Data qntCasosTesteFalhandoData = new XYChart.Data(dataHoraStudentTimeline, studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
                 lnQntCasosDeTesteFalhando.getData().add(qntCasosTesteFalhandoData);
                 coverageTooltip.append("CT F: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
-                
+
                 qntCasosTesteData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
                 qntCasosTestePassandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
                 qntCasosTesteFalhandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
@@ -776,12 +714,19 @@ public class FXMLController implements Initializable {
         lineChartCoverage.getData().clear();
         lineChartCoverage.getData().addAll(lnInstruction, lnBranch, lnLine, lnMethod, lnClass);
         lineChartCoverage.setCursor(Cursor.CROSSHAIR);
-        
+
+        testVerticalMarker = new TreeMap<>();
+        coverageVerticalMarker = new TreeMap<>();
+
+        int iterationIndex = 0;
         for (Date iteracao : iteracoes) {
-            testVerticalMarker = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(iteracao.getTime()), ZoneId.systemDefault()), 5);
-            coverageVerticalMarker = new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(iteracao.getTime()), ZoneId.systemDefault()), 5);
-            lineChart.addVerticalValueMarker(testVerticalMarker);
-            lineChartCoverage.addVerticalValueMarker(coverageVerticalMarker);
+            if (iteracao != null) {
+                testVerticalMarker.put(iterationIndex, new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(iteracao.getTime()), ZoneId.systemDefault()), 5));
+                coverageVerticalMarker.put(iterationIndex, new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(iteracao.getTime()), ZoneId.systemDefault()), 5));
+                lineChart.addVerticalValueMarker(testVerticalMarker.get(iterationIndex));
+                lineChartCoverage.addVerticalValueMarker(coverageVerticalMarker.get(iterationIndex));
+            }
+            iterationIndex++;
         }
 
         cbIteracao1.getItems().addAll(projectTimeLine.keySet());
@@ -790,7 +735,7 @@ public class FXMLController implements Initializable {
         cbIteracao4.getItems().addAll(projectTimeLine.keySet());
         cbIteracao5.getItems().addAll(projectTimeLine.keySet());
         cbIteracao6.getItems().addAll(projectTimeLine.keySet());
-        
+
         cbExperimentalGroup.getItems().add(ExperimentalGroup.INTERVENTION);
         cbExperimentalGroup.getItems().add(ExperimentalGroup.CONTROL);
 
@@ -800,7 +745,7 @@ public class FXMLController implements Initializable {
         cbIteracao4.getSelectionModel().select(prop.getFourthIteration());
         cbIteracao5.getSelectionModel().select(prop.getFifthIteration());
         cbIteracao6.getSelectionModel().select(prop.getSixthIteration());
-        
+
         cbExperimentalGroup.getSelectionModel().select(prop.getCurrentStudent().getExperimentalType());
 
         cbIteracao1.setDisable(false);
@@ -809,7 +754,7 @@ public class FXMLController implements Initializable {
         cbIteracao4.setDisable(false);
         cbIteracao5.setDisable(false);
         cbIteracao6.setDisable(false);
-        
+
         cbExperimentalGroup.setDisable(false);
 
         cbIteracao1.setVisibleRowCount(6);
@@ -825,10 +770,9 @@ public class FXMLController implements Initializable {
         cbIteracao4.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao4);
         cbIteracao5.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao5);
         cbIteracao6.getSelectionModel().selectedItemProperty().addListener(cbListenerIteracao6);
-        
+
         cbExperimentalGroup.getSelectionModel().selectedItemProperty().addListener(cbListenerExperimentalGroup);
-        
-        
+
         MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.AVERAGE);
 
     }
@@ -870,7 +814,7 @@ public class FXMLController implements Initializable {
 
         fProp = new File(projectFolder + propFilePath);
         prop = xmlMapper.readValue(fProp, TDDCriteriaProjectProperties.class);
-        
+
         List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
         for (String lnTddStages : tddStages) {
 
@@ -923,4 +867,49 @@ public class FXMLController implements Initializable {
             xmlMapper.writeValue(fProp, prop);
         }
     }
+
+    private void changeMarker(int iterationNumber, Date newValue) {
+        
+        int iterationNumberInternal = iterationNumber-1;
+
+        if (testVerticalMarker.get(iterationNumberInternal) != null && coverageVerticalMarker.get(iterationNumberInternal) != null) {
+            lineChart.removeHorizontalValueMarker(testVerticalMarker.get(iterationNumberInternal));
+            lineChartCoverage.removeHorizontalValueMarker(coverageVerticalMarker.get(iterationNumberInternal));
+            testVerticalMarker.remove(iterationNumberInternal);
+            coverageVerticalMarker.remove(iterationNumberInternal);
+        }
+        
+        testVerticalMarker.put(iterationNumberInternal, new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(newValue.getTime()), ZoneId.systemDefault()), 5));
+        coverageVerticalMarker.put(iterationNumberInternal, new XYChart.Data<>(LocalDateTime.ofInstant(Instant.ofEpochMilli(newValue.getTime()), ZoneId.systemDefault()), 5));
+        lineChart.addVerticalValueMarker(testVerticalMarker.get(iterationNumberInternal));
+        lineChartCoverage.addVerticalValueMarker(coverageVerticalMarker.get(iterationNumberInternal));
+
+        setPropertiesIterationValue(iterationNumber, newValue);
+    }
+    
+    private void setPropertiesIterationValue (int iterationNumber, Date newValue) {
+        
+        switch (iterationNumber) {
+            case 1:
+                prop.setFirstIteration(newValue);
+                break;
+            case 2:
+                prop.setSecondIteration(newValue);
+                break;
+            case 3:
+                prop.setThirdIteration(newValue);
+                break;
+            case 4:
+                prop.setFourthIteration(newValue);
+                break;
+            case 5:
+                prop.setFifthIteration(newValue);
+                break;
+            case 6:
+                prop.setSixthIteration(newValue);
+                break;
+        }
+        
+    }
+
 }

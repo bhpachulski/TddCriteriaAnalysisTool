@@ -24,6 +24,9 @@ import net.bhpachulski.tddcriteria.model.Eclemma.Type;
 import net.bhpachulski.tddcriteria.model.TDDCriteriaProjectProperties;
 import net.bhpachulski.tddcriteria.model.TestSuiteSession;
 import net.bhpachulski.tddcriteria.model.analysis.TDDCriteriaProjectSnapshot;
+import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
+import org.apache.commons.math3.stat.ranking.NaNStrategy;
+import org.apache.commons.math3.stat.ranking.TiesStrategy;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
@@ -53,10 +56,10 @@ public class ProjectsToCSV {
         SimpleDateFormat sdfShow = new SimpleDateFormat("HH:mm:ss");
 
         ProjectsToCSV p = new ProjectsToCSV();
-//        String retorno = p.getCSVDadosResumido(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
-//        System.out.println(retorno);
+        String retorno = p.getCSVDadosResumido(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
+        System.out.println(retorno);
 
-        System.out.println(p.getTddTimelineCSV ());
+//        System.out.println(p.getTddTimelineCSV ());
         
     }
     
@@ -88,7 +91,7 @@ public class ProjectsToCSV {
 
             Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = parseAllProjects(projectFolder);
 
-            fileContent.append("RA; NOME; ITERACAO; ESTAGIO TDD; HORÁRIO INICIO; HORÁRIO FIM; TEMPO; QNT CASOS DE TESTE; QNT CASOS DE TESTE PASSANDO; QNT CASOS DE TESTE FALHANDO; COBERTURA DE CLASS; COBERTURA DE METODO; COBERTURA DE LINHAS; COBERTURA DE INSTRUCOES; COBERTURA DE RAMOS; \n");
+            fileContent.append("GROUP; RA; NOME; ITERACAO; ESTAGIO TDD; HORÁRIO INICIO; HORÁRIO FIM; TEMPO; QNT CASOS DE TESTE; QNT CASOS DE TESTE PASSANDO; QNT CASOS DE TESTE FALHANDO; COBERTURA DE CLASS; COBERTURA DE METODO; COBERTURA DE LINHAS; COBERTURA DE INSTRUCOES; COBERTURA DE RAMOS; \n");
 
             for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
 
@@ -383,6 +386,7 @@ public class ProjectsToCSV {
 
         StringBuilder studentLine = new StringBuilder();
 
+        studentLine.append(propAluno.getCurrentStudent().getExperimentalType()).append(";");
         studentLine.append(propAluno.getCurrentStudent().getId()).append("; ").append(propAluno.getCurrentStudent().getName()).append(";");
         studentLine.append(iteracao).append(";");
         studentLine.append(tddStage).append(";");
@@ -442,6 +446,8 @@ public class ProjectsToCSV {
                     studentLine.append(branchCoverage);
                     studentLine.append(";");
                 });
+                
+                MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.AVERAGE);
             } else {
                 studentLine.append("s/r;s/r;s/r;s/r;s/r;");
             }

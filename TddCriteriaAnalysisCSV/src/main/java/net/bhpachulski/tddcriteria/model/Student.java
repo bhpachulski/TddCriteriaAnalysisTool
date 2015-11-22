@@ -5,6 +5,8 @@ public class Student {
     private int id;
     private String name;
     
+    private ExperimentalGroup experimentalType;
+    
     public Student() {}
     
     public Student(String name) {
@@ -27,5 +29,12 @@ public class Student {
         this.name = name;
     }
 
+    public ExperimentalGroup getExperimentalType() {
+        return experimentalType;
+    }
+
+    public void setExperimentalType(ExperimentalGroup experimentalType) {
+        this.experimentalType = experimentalType;
+    }
     
 }
