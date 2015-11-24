@@ -402,7 +402,7 @@ public class ProjectsToCSV {
                         System.out.println("       . Controle: " + controlGroupValue);
                         System.out.println("       . Intervenção: " + interventionGroupValue);
 
-                        MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.AVERAGE);
+                        MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.MINIMUM);
 //                        MannWhitneyUTest mannTest = new MannWhitneyUTest();
 
                         if (!controlGroupValue.isEmpty() && !interventionGroupValue.isEmpty()) {
