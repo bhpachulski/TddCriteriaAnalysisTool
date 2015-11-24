@@ -4,6 +4,7 @@ public class Student {
 	 
     private int id;
     private String name;
+    private boolean excluido = false;
     
     private ExperimentalGroup experimentalType;
     
@@ -36,5 +37,12 @@ public class Student {
     public void setExperimentalType(ExperimentalGroup experimentalType) {
         this.experimentalType = experimentalType;
     }
-    
+
+    public boolean isExcluido() {
+        return excluido;
+    }
+
+    public void setExcluido(boolean excluido) {
+        this.excluido = excluido;
+    }
 }

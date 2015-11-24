@@ -75,7 +75,7 @@
 <String fx:value="Item 3" />
 </FXCollections>
 </items>
-</ComboBox><Label layoutX="465.0" layoutY="35.0" text="Grupo" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" />
+</ComboBox><Label layoutX="465.0" layoutY="35.0" text="Grupo" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" /><CheckBox fx:id="checkExcluido" layoutX="465.0" layoutY="65.0" mnemonicParsing="false" onAction="#checkProjetoExcluido" text="Projeto Excluído" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" />
 </children></AnchorPane>
       </content>
     </Tab>

@@ -126,6 +126,9 @@ public class FXMLController implements Initializable {
 
     @FXML
     private CheckBox checkTimeLineFake;
+    
+    @FXML
+    private CheckBox checkExcluido;
 
     @FXML
     private ComboBox<Date> cbIteracao1;
@@ -396,6 +399,15 @@ public class FXMLController implements Initializable {
             lineChartCoverage.getData().add(lnClass);
         } else {
             lineChartCoverage.getData().remove(lnClass);
+        }
+    }
+    
+    @FXML
+    private void checkProjetoExcluido(ActionEvent event) {
+        if (checkExcluido.isSelected()) {
+            prop.getCurrentStudent().setExcluido(true);
+        } else {
+            prop.getCurrentStudent().setExcluido(false);
         }
     }
 
@@ -814,6 +826,8 @@ public class FXMLController implements Initializable {
 
         fProp = new File(projectFolder + propFilePath);
         prop = xmlMapper.readValue(fProp, TDDCriteriaProjectProperties.class);
+        
+        checkExcluido.setSelected(prop.getCurrentStudent().isExcluido());
 
         List<String> tddStages = java.nio.file.Files.readAllLines(Paths.get(projectFolder + EclemmaFolderPath + tddStageTrackPath));
         for (String lnTddStages : tddStages) {
