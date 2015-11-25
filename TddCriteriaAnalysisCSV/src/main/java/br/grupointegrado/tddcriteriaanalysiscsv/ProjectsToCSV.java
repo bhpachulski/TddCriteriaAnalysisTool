@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class ProjectsToCSV {
                             secondIteration.put(e.getKey(), e.getValue());
 
                         });
-                
+
                 studentTimeLineES.getValue().entrySet().stream()
                         .filter(e
                                 -> (new DateTime(e.getKey()).isAfter(new DateTime(propAluno.getSecondIteration())))
@@ -165,14 +166,14 @@ public class ProjectsToCSV {
                 studentTimeLineES.getValue().entrySet().stream()
                         .filter(e
                                 -> (new DateTime(e.getKey()).isAfter(new DateTime(propAluno.getFifthIteration())))
-                                && (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSixthIteration())))                                       
+                                && (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSixthIteration())))
                                 || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getSixthIteration()))))
                         .forEach(e -> {
 
                             sixthIteration.put(e.getKey(), e.getValue());
 
                         });
-                
+
                 fileContent.append(getIterationValues(firstIteration, 1, "RED", propAluno));
                 fileContent.append(getIterationValues(firstIteration, 1, "GREEN", propAluno));
                 fileContent.append(getIterationValues(firstIteration, 1, "REFACTOR", propAluno));
@@ -222,34 +223,52 @@ public class ProjectsToCSV {
 
             Map<Integer, Map<String, List<TDDCriteriaProjectSnapshot>>> iteracaoSnapshot = new TreeMap<>();
             iteracaoSnapshot.put(1, new TreeMap<>());
-            iteracaoSnapshot.get(1).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(1).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(1).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(1).put("FIRST-REFACTOR", new ArrayList<>());
 
             iteracaoSnapshot.put(2, new TreeMap<>());
-            iteracaoSnapshot.get(2).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(2).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(2).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(2).put("FIRST-REFACTOR", new ArrayList<>());
 
             iteracaoSnapshot.put(3, new TreeMap<>());
-            iteracaoSnapshot.get(3).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(3).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(3).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(3).put("FIRST-REFACTOR", new ArrayList<>());
 
             iteracaoSnapshot.put(4, new TreeMap<>());
-            iteracaoSnapshot.get(4).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(4).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(4).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(4).put("FIRST-REFACTOR", new ArrayList<>());
 
             iteracaoSnapshot.put(5, new TreeMap<>());
-            iteracaoSnapshot.get(5).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(5).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(5).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(5).put("FIRST-REFACTOR", new ArrayList<>());
 
             iteracaoSnapshot.put(6, new TreeMap<>());
-            iteracaoSnapshot.get(6).put("RED", new ArrayList<>());
-            iteracaoSnapshot.get(6).put("GREEN", new ArrayList<>());
-            iteracaoSnapshot.get(6).put("REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("LAST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("LAST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("LAST-REFACTOR", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("FIRST-RED", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("FIRST-GREEN", new ArrayList<>());
+            iteracaoSnapshot.get(6).put("FIRST-REFACTOR", new ArrayList<>());
 
             for (Map.Entry<String, Map<Date, TDDCriteriaProjectSnapshot>> studentTimeLineES : studentsTimeLine.entrySet()) {
 
@@ -282,7 +301,7 @@ public class ProjectsToCSV {
                             secondIteration.put(e.getKey(), e.getValue());
 
                         });
-                
+
                 studentTimeLineES.getValue().entrySet().stream()
                         .filter(e
                                 -> (new DateTime(e.getKey()).isAfter(new DateTime(propAluno.getSecondIteration())))
@@ -319,7 +338,7 @@ public class ProjectsToCSV {
                 studentTimeLineES.getValue().entrySet().stream()
                         .filter(e
                                 -> (new DateTime(e.getKey()).isAfter(new DateTime(propAluno.getFifthIteration())))
-                                && (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSixthIteration())))                                       
+                                && (new DateTime(e.getKey()).isBefore(new DateTime(propAluno.getSixthIteration())))
                                 || (new DateTime(e.getKey()).isEqual(new DateTime(propAluno.getSixthIteration()))))
                         .forEach(e -> {
 
@@ -327,37 +346,70 @@ public class ProjectsToCSV {
 
                         });
 
-                iteracaoSnapshot.get(1).get("RED").add(getIterationStageSnapshot(firstIteration, "RED"));
-                iteracaoSnapshot.get(1).get("GREEN").add(getIterationStageSnapshot(firstIteration, "GREEN"));
-                iteracaoSnapshot.get(1).get("REFACTOR").add(getIterationStageSnapshot(firstIteration, "REFACTOR"));
+                iteracaoSnapshot.get(1).get("LAST-RED").add(getLastIterationStageSnapshot(firstIteration, "RED"));
+                iteracaoSnapshot.get(1).get("LAST-GREEN").add(getLastIterationStageSnapshot(firstIteration, "GREEN"));
+                iteracaoSnapshot.get(1).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(firstIteration, "REFACTOR"));
 
-                iteracaoSnapshot.get(2).get("RED").add(getIterationStageSnapshot(secondIteration, "RED"));
-                iteracaoSnapshot.get(2).get("GREEN").add(getIterationStageSnapshot(secondIteration, "GREEN"));
-                iteracaoSnapshot.get(3).get("REFACTOR").add(getIterationStageSnapshot(secondIteration, "REFACTOR"));
+                iteracaoSnapshot.get(1).get("FIRST-RED").add(getFirstIterationStageSnapshot(firstIteration, "RED"));
+                iteracaoSnapshot.get(1).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(firstIteration, "GREEN"));
+                iteracaoSnapshot.get(1).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(firstIteration, "REFACTOR"));
 
-                iteracaoSnapshot.get(3).get("RED").add(getIterationStageSnapshot(thirdteration, "RED"));
-                iteracaoSnapshot.get(3).get("GREEN").add(getIterationStageSnapshot(thirdteration, "GREEN"));
-                iteracaoSnapshot.get(3).get("REFACTOR").add(getIterationStageSnapshot(thirdteration, "REFACTOR"));
+                iteracaoSnapshot.get(2).get("LAST-RED").add(getLastIterationStageSnapshot(secondIteration, "RED"));
+                iteracaoSnapshot.get(2).get("LAST-GREEN").add(getLastIterationStageSnapshot(secondIteration, "GREEN"));
+                iteracaoSnapshot.get(2).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(secondIteration, "REFACTOR"));
 
-                iteracaoSnapshot.get(4).get("RED").add(getIterationStageSnapshot(fourthIteration, "RED"));
-                iteracaoSnapshot.get(4).get("GREEN").add(getIterationStageSnapshot(fourthIteration, "GREEN"));
-                iteracaoSnapshot.get(4).get("REFACTOR").add(getIterationStageSnapshot(fourthIteration, "REFACTOR"));
+                iteracaoSnapshot.get(2).get("FIRST-RED").add(getFirstIterationStageSnapshot(secondIteration, "RED"));
+                iteracaoSnapshot.get(2).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(secondIteration, "GREEN"));
+                iteracaoSnapshot.get(2).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(secondIteration, "REFACTOR"));
 
-                iteracaoSnapshot.get(5).get("RED").add(getIterationStageSnapshot(fifithIteration, "RED"));
-                iteracaoSnapshot.get(5).get("GREEN").add(getIterationStageSnapshot(fifithIteration, "GREEN"));
-                iteracaoSnapshot.get(5).get("REFACTOR").add(getIterationStageSnapshot(fifithIteration, "REFACTOR"));
+                iteracaoSnapshot.get(3).get("LAST-RED").add(getLastIterationStageSnapshot(thirdteration, "RED"));
+                iteracaoSnapshot.get(3).get("LAST-GREEN").add(getLastIterationStageSnapshot(thirdteration, "GREEN"));
+                iteracaoSnapshot.get(3).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(thirdteration, "REFACTOR"));
 
-                iteracaoSnapshot.get(6).get("RED").add(getIterationStageSnapshot(sixthIteration, "RED"));
-                iteracaoSnapshot.get(6).get("GREEN").add(getIterationStageSnapshot(sixthIteration, "GREEN"));
-                iteracaoSnapshot.get(6).get("REFACTOR").add(getIterationStageSnapshot(sixthIteration, "REFACTOR"));
+                iteracaoSnapshot.get(3).get("FIRST-RED").add(getFirstIterationStageSnapshot(thirdteration, "RED"));
+                iteracaoSnapshot.get(3).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(thirdteration, "GREEN"));
+                iteracaoSnapshot.get(3).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(thirdteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(4).get("LAST-RED").add(getLastIterationStageSnapshot(fourthIteration, "RED"));
+                iteracaoSnapshot.get(4).get("LAST-GREEN").add(getLastIterationStageSnapshot(fourthIteration, "GREEN"));
+                iteracaoSnapshot.get(4).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(fourthIteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(4).get("FIRST-RED").add(getFirstIterationStageSnapshot(fourthIteration, "RED"));
+                iteracaoSnapshot.get(4).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(fourthIteration, "GREEN"));
+                iteracaoSnapshot.get(4).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(fourthIteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(5).get("LAST-RED").add(getLastIterationStageSnapshot(fifithIteration, "RED"));
+                iteracaoSnapshot.get(5).get("LAST-GREEN").add(getLastIterationStageSnapshot(fifithIteration, "GREEN"));
+                iteracaoSnapshot.get(5).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(fifithIteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(5).get("FIRST-RED").add(getFirstIterationStageSnapshot(fifithIteration, "RED"));
+                iteracaoSnapshot.get(5).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(fifithIteration, "GREEN"));
+                iteracaoSnapshot.get(5).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(fifithIteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(6).get("LAST-RED").add(getLastIterationStageSnapshot(sixthIteration, "RED"));
+                iteracaoSnapshot.get(6).get("LAST-GREEN").add(getLastIterationStageSnapshot(sixthIteration, "GREEN"));
+                iteracaoSnapshot.get(6).get("LAST-REFACTOR").add(getLastIterationStageSnapshot(sixthIteration, "REFACTOR"));
+
+                iteracaoSnapshot.get(6).get("FIRST-RED").add(getFirstIterationStageSnapshot(sixthIteration, "RED"));
+                iteracaoSnapshot.get(6).get("FIRST-GREEN").add(getFirstIterationStageSnapshot(sixthIteration, "GREEN"));
+                iteracaoSnapshot.get(6).get("FIRST-REFACTOR").add(getFirstIterationStageSnapshot(sixthIteration, "REFACTOR"));
 
             }
 
             System.out.println("");
             System.out.println(" ********** Avaliação dos Grupos ********** ");
             System.out.println("");
+            
+            MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.MINIMUM);
 
             for (int i = 1; i <= 6; i++) {
+
+                iteracaoSnapshot.get(i).get("FIRST-RED").removeAll(Collections.singleton(null));
+                iteracaoSnapshot.get(i).get("FIRST-GREEN").removeAll(Collections.singleton(null));
+                iteracaoSnapshot.get(i).get("FIRST-REFACTOR").removeAll(Collections.singleton(null));
+                iteracaoSnapshot.get(i).get("LAST-RED").removeAll(Collections.singleton(null));
+                iteracaoSnapshot.get(i).get("LAST-GREEN").removeAll(Collections.singleton(null));
+                iteracaoSnapshot.get(i).get("LAST-REFACTOR").removeAll(Collections.singleton(null));
 
                 System.out.println("Iteração: " + i);
 
@@ -365,18 +417,36 @@ public class ProjectsToCSV {
 
                     System.out.println("   - Estágio do TDD: " + estagio);
 
+                    List<TDDCriteriaProjectSnapshot> controleLast = iteracaoSnapshot.get(i).get("LAST-" + estagio).stream()
+                            .filter(f -> f != null)
+                            .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
+                            .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.CONTROL))
+                            .collect(Collectors.toList());
+
+                    List<TDDCriteriaProjectSnapshot> controleFirst = iteracaoSnapshot.get(i).get("FIRST-" + estagio).stream()
+                            .filter(f -> f != null)
+                            .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
+                            .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.CONTROL))
+                            .collect(Collectors.toList());
+
+                    List<TDDCriteriaProjectSnapshot> interventionLast = iteracaoSnapshot.get(i).get("LAST-" + estagio).stream()
+                            .filter(f -> f != null)
+                            .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
+                            .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.INTERVENTION))
+                            .collect(Collectors.toList());
+
+                    List<TDDCriteriaProjectSnapshot> interventionFirst = iteracaoSnapshot.get(i).get("FIRST-" + estagio).stream()
+                            .filter(f -> f != null)
+                            .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
+                            .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.INTERVENTION))
+                            .collect(Collectors.toList());
+
                     for (Type type : Arrays.asList(new Type[]{Type.INSTRUCTION, Type.BRANCH})) {
 
                         List<Double> controlGroupValue = new ArrayList<>();
                         List<Double> interventionGroupValue = new ArrayList<>();
 
-                        List<TDDCriteriaProjectSnapshot> controle = iteracaoSnapshot.get(i).get(estagio).stream()
-                                .filter(f -> f != null)
-                                .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
-                                .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.CONTROL))
-                                .collect(Collectors.toList());
-
-                        for (TDDCriteriaProjectSnapshot snapControle : controle) {
+                        for (TDDCriteriaProjectSnapshot snapControle : controleLast) {
                             double val = coverageCounter(snapControle, type);
 
                             if (!Double.isNaN(val)) {
@@ -384,13 +454,7 @@ public class ProjectsToCSV {
                             }
                         }
 
-                        List<TDDCriteriaProjectSnapshot> intervention = iteracaoSnapshot.get(i).get(estagio).stream()
-                                .filter(f -> f != null)
-                                .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
-                                .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getExperimentalType().equals(ExperimentalGroup.INTERVENTION))
-                                .collect(Collectors.toList());
-
-                        for (TDDCriteriaProjectSnapshot snapintervention : intervention) {
+                        for (TDDCriteriaProjectSnapshot snapintervention : interventionLast) {
                             double val = coverageCounter(snapintervention, type);
 
                             if (!Double.isNaN(val)) {
@@ -401,9 +465,6 @@ public class ProjectsToCSV {
                         System.out.println("     + " + type);
                         System.out.println("       . Controle: " + controlGroupValue);
                         System.out.println("       . Intervenção: " + interventionGroupValue);
-
-                        MannWhitneyUTest mannTest = new MannWhitneyUTest(NaNStrategy.MINIMAL, TiesStrategy.MINIMUM);
-//                        MannWhitneyUTest mannTest = new MannWhitneyUTest();
 
                         if (!controlGroupValue.isEmpty() && !interventionGroupValue.isEmpty()) {
 
@@ -417,6 +478,33 @@ public class ProjectsToCSV {
 
                     }
 
+                    ArrayList<Double> controleDiferencaMinutos = extractIteractionDuration(controleFirst, controleLast);
+                    ArrayList<Double> intervencaoDiferencaMinutos = extractIteractionDuration(interventionFirst, interventionLast);
+                    
+                    controleDiferencaMinutos.removeAll(
+                            controleDiferencaMinutos.stream()
+                                    .filter(f -> f.equals(0.0)).collect(Collectors.toList())
+                    );
+                    
+                    intervencaoDiferencaMinutos.removeAll(
+                            intervencaoDiferencaMinutos.stream()
+                                    .filter(f -> f.equals(0.0)).collect(Collectors.toList())
+                    );
+
+                    System.out.println("     + Tempo das Iterações");
+                    System.out.println("       . Controle: " + controleDiferencaMinutos);
+                    System.out.println("       . Intervenção: " + intervencaoDiferencaMinutos);
+
+                    if (!controleDiferencaMinutos.isEmpty() && !intervencaoDiferencaMinutos.isEmpty()) {
+
+                        double mannResult = mannTest.mannWhitneyUTest(controleDiferencaMinutos.stream().mapToDouble(Double::doubleValue).toArray(),
+                                intervencaoDiferencaMinutos.stream().mapToDouble(Double::doubleValue).toArray());
+
+                        System.out.println("       . MannWhitneyUTest: "
+                                + ((mannResult < 0.05) ? "DIFERENÇA SIGNIFICATIVA" : "DIFERENÇA NÃO É SIGNIFICATIVA") + " (" + mannResult + ") "
+                        );
+                    }
+
                 }
 
             }
@@ -427,6 +515,40 @@ public class ProjectsToCSV {
 
         return fileContent.toString();
 
+    }
+
+    public ArrayList<Double> extractIteractionDuration(List<TDDCriteriaProjectSnapshot> groupFirst, List<TDDCriteriaProjectSnapshot> groupLast) {
+
+        ArrayList<Double> diferencaMinutos = new ArrayList<>();
+
+        for (TDDCriteriaProjectSnapshot snapControleFirst : groupFirst) {
+
+            Date dtFirst = null;
+            Date dtLast = null;
+
+            if (snapControleFirst.getEclemmaSession() != null) {
+                dtFirst = snapControleFirst.getEclemmaSession().getSessioninfo().getStart();
+            } else if (snapControleFirst.getjUnitSession() != null) {
+                dtFirst = snapControleFirst.getjUnitSession().getLaunched();
+            }
+
+            TDDCriteriaProjectSnapshot snapControleLast = groupLast.stream()
+                    .filter(f -> f.getCriteriaProjectProperties().getCurrentStudent().getId() == snapControleFirst.getCriteriaProjectProperties().getCurrentStudent().getId())
+                    .findFirst().get();
+
+            if (snapControleLast.getEclemmaSession() != null) {
+                dtLast = snapControleLast.getEclemmaSession().getSessioninfo().getStart();
+            } else if (snapControleLast.getjUnitSession() != null) {
+                dtLast = snapControleLast.getjUnitSession().getLaunched();
+            }
+
+            if (dtFirst != null && dtLast != null) {
+                Interval diferencaHoras = new Interval(new DateTime(dtFirst), new DateTime(dtLast));
+                diferencaMinutos.add((double) diferencaHoras.toPeriod().getMinutes());
+            }
+        }
+
+        return diferencaMinutos;
     }
 
     public String getCSVDadosCompletos(File file) throws IOException, ParseException {
@@ -706,10 +828,19 @@ public class ProjectsToCSV {
         return studentLine.toString();
     }
 
-    public TDDCriteriaProjectSnapshot getIterationStageSnapshot(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
+    public TDDCriteriaProjectSnapshot getLastIterationStageSnapshot(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
 
         if (iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).count() > 0) {
             return iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).reduce((a, b) -> b).get().getValue();
+        }
+
+        return null;
+    }
+
+    public TDDCriteriaProjectSnapshot getFirstIterationStageSnapshot(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
+
+        if (iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).count() > 0) {
+            return iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).findFirst().get().getValue();
         }
 
         return null;
