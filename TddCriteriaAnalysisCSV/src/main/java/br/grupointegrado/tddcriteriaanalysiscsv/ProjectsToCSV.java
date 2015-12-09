@@ -63,7 +63,11 @@ public class ProjectsToCSV {
 //        System.out.println(retorno);
 
         String retorno = p.getCSVDadosAgrupados(new File("/Users/bhpachulski/Documents/Projetos/GIT/experimentos/"));
-//        System.out.println(retorno);
+        
+        System.out.println(" ");
+        System.out.println(" ");
+        
+        System.out.println(retorno);
 //        System.out.println(p.getTddTimelineCSV ());
     }
 
@@ -206,6 +210,7 @@ public class ProjectsToCSV {
         return fileContent.toString();
 
     }
+    
 
     public String getCSVDadosAgrupados(File file) throws IOException, ParseException {
 
@@ -218,7 +223,7 @@ public class ProjectsToCSV {
 
             Map<String, Map<Date, TDDCriteriaProjectSnapshot>> studentsTimeLine = parseAllProjects(projectFolder, true);
 
-            fileContent.append("GROUP; RA; NOME; ITERACAO; ESTAGIO TDD; HORÁRIO INICIO; HORÁRIO FIM; TEMPO; QNT CASOS DE TESTE; QNT CASOS DE TESTE PASSANDO; QNT CASOS DE TESTE FALHANDO; COBERTURA DE CLASS; COBERTURA DE METODO; COBERTURA DE LINHAS; COBERTURA DE INSTRUCOES; COBERTURA DE RAMOS; \n");
+            fileContent.append("ITERACAO; ESTAGIO; TIPO; GRUPO Controle; GRUPO Intervenção; P-Value; RESULTADO; \n");
 
             Map<Integer, Map<String, List<TDDCriteriaProjectSnapshot>>> iteracaoSnapshot = new TreeMap<>();
             iteracaoSnapshot.put(1, new TreeMap<>());
@@ -293,6 +298,10 @@ public class ProjectsToCSV {
                             firstIteration.put(e.getKey(), e.getValue());
 
                         });
+                
+                firstIteration.entrySet().stream().forEach(o -> {
+                    System.out.println(o.getValue().getTddStage());
+                });
 
                 studentTimeLineES.getValue().entrySet().stream()
                         .filter(e
@@ -350,183 +359,182 @@ public class ProjectsToCSV {
                         });
 
                 System.out.println("Iteração 01: ");
-                
+
                 TDDCriteriaProjectSnapshot lastRedFirstIteration = getLastIterationStageSnapshot(firstIteration, "RED");
-                System.out.println("Last RED: " + lastRedFirstIteration);                
+                System.out.println("Last RED: " + lastRedFirstIteration);
                 iteracaoSnapshot.get(1).get("LAST-RED").add(lastRedFirstIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenFirstIteration = getLastIterationStageSnapshot(firstIteration, "GREEN");
-                System.out.println("Last GREEN: " + lastRedFirstIteration);                
+                System.out.println("Last GREEN: " + lastRedFirstIteration);
                 iteracaoSnapshot.get(1).get("LAST-GREEN").add(lastGreenFirstIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorFirstIteration = getLastIterationStageSnapshot(firstIteration, "REFACTOR");
-                System.out.println("Last REFACTOR: " + lastRedFirstIteration);                
+                System.out.println("Last REFACTOR: " + lastRedFirstIteration);
                 iteracaoSnapshot.get(1).get("LAST-REFACTOR").add(lastRefactorFirstIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedFirstIteration = getFirstIterationStageSnapshot(firstIteration, "RED");
-                System.out.println("First RED: " + firstRedFirstIteration);                
+                System.out.println("First RED: " + firstRedFirstIteration);
                 iteracaoSnapshot.get(1).get("FIRST-RED").add(firstRedFirstIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenFirstIteration = getFirstIterationStageSnapshot(firstIteration, "GREEN");
                 System.out.println("First GREEN: " + firstGreenFirstIteration);
                 iteracaoSnapshot.get(1).get("FIRST-GREEN").add(firstGreenFirstIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorFirstIteration = getFirstIterationStageSnapshot(firstIteration, "REFACTOR");
                 System.out.println("First REFACTOR: " + firstRefactorFirstIteration);
                 iteracaoSnapshot.get(1).get("FIRST-REFACTOR").add(firstRefactorFirstIteration);
-                
+
                 System.out.println(" ");
-                
+
                 System.out.println("Iteração 02: ");
 
                 TDDCriteriaProjectSnapshot lastRedSecondIteration = getLastIterationStageSnapshot(secondIteration, "RED");
-                System.out.println("Last RED: " + lastRedSecondIteration);                
+                System.out.println("Last RED: " + lastRedSecondIteration);
                 iteracaoSnapshot.get(2).get("LAST-RED").add(lastRedSecondIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenSecondIteration = getLastIterationStageSnapshot(secondIteration, "GREEN");
-                System.out.println("Last GREEN: " + lastGreenSecondIteration);                
+                System.out.println("Last GREEN: " + lastGreenSecondIteration);
                 iteracaoSnapshot.get(2).get("LAST-GREEN").add(lastGreenSecondIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorSecondIteration = getLastIterationStageSnapshot(secondIteration, "REFACTOR");
-                System.out.println("Last REFACTOR: " + lastRefactorSecondIteration);                
+                System.out.println("Last REFACTOR: " + lastRefactorSecondIteration);
                 iteracaoSnapshot.get(2).get("LAST-REFACTOR").add(lastRefactorSecondIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedSecondIteration = getFirstIterationStageSnapshot(secondIteration, "RED");
-                System.out.println("First RED: " + firstRedSecondIteration);                
+                System.out.println("First RED: " + firstRedSecondIteration);
                 iteracaoSnapshot.get(2).get("FIRST-RED").add(firstRedSecondIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenSecondIteration = getFirstIterationStageSnapshot(secondIteration, "GREEN");
-                System.out.println("First GREEN: " + firstGreenSecondIteration);                
+                System.out.println("First GREEN: " + firstGreenSecondIteration);
                 iteracaoSnapshot.get(2).get("FIRST-GREEN").add(firstGreenSecondIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorSecondIteration = getFirstIterationStageSnapshot(secondIteration, "REFACTOR");
-                System.out.println("First REFACTOR: " + firstRefactorSecondIteration);                
+                System.out.println("First REFACTOR: " + firstRefactorSecondIteration);
                 iteracaoSnapshot.get(2).get("FIRST-REFACTOR").add(firstRefactorSecondIteration);
-                
+
                 System.out.println(" ");
-                
+
                 System.out.println("Iteração 03: ");
 
                 TDDCriteriaProjectSnapshot lastRedThirdIteration = getLastIterationStageSnapshot(thirdteration, "RED");
                 System.out.println("Last RED: " + lastRedThirdIteration);
                 iteracaoSnapshot.get(3).get("LAST-RED").add(lastRedThirdIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenThirdIteration = getLastIterationStageSnapshot(thirdteration, "GREEN");
                 System.out.println("Last GREEN: " + lastGreenThirdIteration);
                 iteracaoSnapshot.get(3).get("LAST-GREEN").add(lastGreenThirdIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorThirdIteration = getLastIterationStageSnapshot(thirdteration, "REFACTOR");
                 System.out.println("Last REFACTOR: " + lastRefactorThirdIteration);
                 iteracaoSnapshot.get(3).get("LAST-REFACTOR").add(lastRefactorThirdIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedThirdIteration = getFirstIterationStageSnapshot(thirdteration, "RED");
-                System.out.println("First RED: " + firstRedThirdIteration);     
+                System.out.println("First RED: " + firstRedThirdIteration);
                 iteracaoSnapshot.get(3).get("FIRST-RED").add(firstRedThirdIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenThirdIteration = getFirstIterationStageSnapshot(thirdteration, "GREEN");
-                System.out.println("First GREEN: " + firstGreenThirdIteration);     
+                System.out.println("First GREEN: " + firstGreenThirdIteration);
                 iteracaoSnapshot.get(3).get("FIRST-GREEN").add(firstGreenThirdIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorThirdIteration = getFirstIterationStageSnapshot(thirdteration, "REFACTOR");
-                System.out.println("First REFACTOR: " + firstRefactorThirdIteration);     
+                System.out.println("First REFACTOR: " + firstRefactorThirdIteration);
                 iteracaoSnapshot.get(3).get("FIRST-REFACTOR").add(firstRefactorThirdIteration);
-                
+
                 System.out.println(" ");
-                
+
                 System.out.println("Iteração 04: ");
 
                 TDDCriteriaProjectSnapshot lastRedFourthIteration = getLastIterationStageSnapshot(fourthIteration, "RED");
                 System.out.println("Last RED: " + lastRedFourthIteration);
                 iteracaoSnapshot.get(4).get("LAST-RED").add(lastRedFourthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenFourthIteration = getLastIterationStageSnapshot(fourthIteration, "GREEN");
                 System.out.println("Last GREEN: " + lastGreenFourthIteration);
                 iteracaoSnapshot.get(4).get("LAST-GREEN").add(lastGreenFourthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorFourthIteration = getLastIterationStageSnapshot(fourthIteration, "REFACTOR");
                 System.out.println("Last REFACTOR: " + lastRefactorFourthIteration);
                 iteracaoSnapshot.get(4).get("LAST-REFACTOR").add(lastRefactorFourthIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedFourthIteration = getFirstIterationStageSnapshot(fourthIteration, "RED");
                 System.out.println("First RED: " + firstRedFourthIteration);
                 iteracaoSnapshot.get(4).get("FIRST-RED").add(firstRedFourthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenFourthIteration = getFirstIterationStageSnapshot(fourthIteration, "GREEN");
                 System.out.println("First GREEN: " + firstGreenFourthIteration);
                 iteracaoSnapshot.get(4).get("FIRST-GREEN").add(firstGreenFourthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorFourthIteration = getFirstIterationStageSnapshot(fourthIteration, "REFACTOR");
                 System.out.println("First REFACTOR: " + firstRefactorFourthIteration);
                 iteracaoSnapshot.get(4).get("FIRST-REFACTOR").add(firstRefactorFourthIteration);
-                
+
                 System.out.println(" ");
-                
+
                 System.out.println("Iteração 05: ");
 
                 TDDCriteriaProjectSnapshot lastRedFifthIteration = getLastIterationStageSnapshot(fifithIteration, "RED");
                 System.out.println("Last RED: " + lastRedFifthIteration);
                 iteracaoSnapshot.get(5).get("LAST-RED").add(lastRedFifthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenFifthIteration = getLastIterationStageSnapshot(fifithIteration, "GREEN");
                 System.out.println("Last GREEN: " + lastGreenFifthIteration);
                 iteracaoSnapshot.get(5).get("LAST-GREEN").add(lastGreenFifthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorFifthIteration = getLastIterationStageSnapshot(fifithIteration, "REFACTOR");
                 System.out.println("Last REFACTOR: " + lastRefactorFifthIteration);
                 iteracaoSnapshot.get(5).get("LAST-REFACTOR").add(lastRefactorFifthIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedFifthIteration = getFirstIterationStageSnapshot(fifithIteration, "RED");
                 System.out.println("First RED: " + firstRedFifthIteration);
                 iteracaoSnapshot.get(5).get("FIRST-RED").add(firstRedFifthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenFifthIteration = getFirstIterationStageSnapshot(fifithIteration, "GREEN");
                 System.out.println("First GREEN: " + firstGreenFifthIteration);
                 iteracaoSnapshot.get(5).get("FIRST-GREEN").add(firstGreenFifthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorFifthIteration = getFirstIterationStageSnapshot(fifithIteration, "REFACTOR");
                 System.out.println("First REFACTOR: " + firstRefactorFifthIteration);
                 iteracaoSnapshot.get(5).get("FIRST-REFACTOR").add(firstRefactorFifthIteration);
-                
+
                 System.out.println(" ");
-                
+
                 System.out.println("Iteração 06: ");
 
                 TDDCriteriaProjectSnapshot lastRedSixthIteration = getLastIterationStageSnapshot(sixthIteration, "RED");
                 System.out.println("Last RED: " + lastRedSixthIteration);
                 iteracaoSnapshot.get(6).get("LAST-RED").add(lastRedSixthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastGreenSixthIteration = getLastIterationStageSnapshot(sixthIteration, "GREEN");
                 System.out.println("Last GREEN: " + lastGreenSixthIteration);
                 iteracaoSnapshot.get(6).get("LAST-GREEN").add(lastGreenSixthIteration);
-                
+
                 TDDCriteriaProjectSnapshot lastRefactorSixthIteration = getLastIterationStageSnapshot(sixthIteration, "REFACTOR");
                 System.out.println("Last REFACTOR: " + lastRefactorSixthIteration);
                 iteracaoSnapshot.get(6).get("LAST-REFACTOR").add(lastRefactorSixthIteration);
-                
+
                 System.out.println(" ");
 
                 TDDCriteriaProjectSnapshot firstRedSixthIteration = getFirstIterationStageSnapshot(sixthIteration, "RED");
                 System.out.println("First RED: " + firstRedSixthIteration);
                 iteracaoSnapshot.get(6).get("FIRST-RED").add(firstRedSixthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstGreenSixthIteration = getFirstIterationStageSnapshot(sixthIteration, "GREEN");
                 System.out.println("First GREEN: " + firstGreenSixthIteration);
                 iteracaoSnapshot.get(6).get("FIRST-GREEN").add(firstGreenSixthIteration);
-                
+
                 TDDCriteriaProjectSnapshot firstRefactorSixthIteration = getFirstIterationStageSnapshot(sixthIteration, "REFACTOR");
                 System.out.println("First REFACTOR: " + firstRefactorSixthIteration);
                 iteracaoSnapshot.get(6).get("FIRST-REFACTOR").add(firstRefactorSixthIteration);
-
 
             }
 
@@ -543,7 +551,7 @@ public class ProjectsToCSV {
                 for (String estagio : Arrays.asList(new String[]{"RED", "GREEN", "REFACTOR"})) {
 
                     System.out.println("   - Estágio do TDD: " + estagio);
-
+                    
                     List<TDDCriteriaProjectSnapshot> controleLast = iteracaoSnapshot.get(i).get("LAST-" + estagio).stream()
                             .filter(f -> f != null)
                             .filter(f -> !f.getCriteriaProjectProperties().getCurrentStudent().isExcluido())
@@ -592,6 +600,14 @@ public class ProjectsToCSV {
                         System.out.println("     + " + type);
                         System.out.println("       . Controle: " + controlGroupValue);
                         System.out.println("       . Intervenção: " + interventionGroupValue);
+                        
+                        fileContent.append(i).append("; ");
+                        fileContent.append(estagio).append("; ");
+                        
+                        fileContent.append(type).append("; ");
+                        
+                        fileContent.append(controlGroupValue).append("; ");
+                        fileContent.append(interventionGroupValue).append("; ");
 
                         if (!controlGroupValue.isEmpty() && !interventionGroupValue.isEmpty()) {
 
@@ -601,21 +617,29 @@ public class ProjectsToCSV {
                             System.out.println("       . MannWhitneyUTest: "
                                     + ((mannResult < 0.05) ? "DIFERENÇA SIGNIFICATIVA" : "DIFERENÇA NÃO É SIGNIFICATIVA") + " (" + mannResult + ") "
                             );
+                            
+                            fileContent.append(mannResult).append("; ");
+                            
+                            fileContent.append(((mannResult < 0.05) ? "DIFERENÇA SIGNIFICATIVA" : "DIFERENÇA NÃO É SIGNIFICATIVA")).append("; ");
+                            fileContent.append("\n");
+                        } else {
+                            fileContent.append(" ; ").append(" ; ").append("\n");
                         }
 
                     }
 
                     ArrayList<Double> controleDiferencaMinutos = extractIteractionDuration(controleFirst, controleLast);
                     ArrayList<Double> intervencaoDiferencaMinutos = extractIteractionDuration(interventionFirst, interventionLast);
+                    
+                    fileContent.append(i).append("; ");
+                    fileContent.append(estagio).append("; ");
+                    
+                    fileContent.append("TEMPO").append("; ");
+                    
+                    fileContent.append(controleDiferencaMinutos).append("; ");
+                    fileContent.append(intervencaoDiferencaMinutos).append("; ");
+                    
 
-//                    controleDiferencaMinutos.removeAll(
-//                            controleDiferencaMinutos.stream()
-//                                    .filter(f -> f.equals(0.0)).collect(Collectors.toList())
-//                    );
-//                    intervencaoDiferencaMinutos.removeAll(
-//                            intervencaoDiferencaMinutos.stream()
-//                                    .filter(f -> f.equals(0.0)).collect(Collectors.toList())
-//                    );
                     System.out.println("     + Tempo das Iterações");
                     System.out.println("       . Controle: " + controleDiferencaMinutos);
                     System.out.println("       . Intervenção: " + intervencaoDiferencaMinutos);
@@ -628,15 +652,20 @@ public class ProjectsToCSV {
                         System.out.println("       . MannWhitneyUTest: "
                                 + ((mannResult < 0.05) ? "DIFERENÇA SIGNIFICATIVA" : "DIFERENÇA NÃO É SIGNIFICATIVA") + " (" + mannResult + ") "
                         );
+                        
+                        fileContent.append(mannResult).append("; ");
+                        fileContent.append(((mannResult < 0.05) ? "DIFERENÇA SIGNIFICATIVA" : "DIFERENÇA NÃO É SIGNIFICATIVA")).append("; ");
+                        fileContent.append("\n");
+                    } else {
+                        fileContent.append(" ; ").append(" ; ").append("\n");
                     }
-
+                    
                 }
-
             }
 
         } else {
 //            System.out.println("SHOW ERROR MESSAGE !");
-        }
+        }        
 
         return fileContent.toString();
 
@@ -777,8 +806,9 @@ public class ProjectsToCSV {
             System.out.println(" * " + folder.getName());
             Map<Date, TDDCriteriaProjectSnapshot> timeline = readProject(folder.getAbsolutePath() + "/" + folder.getName().split("-")[0].trim());
 
-            if (ignoreExcluded && !timeline.entrySet().stream().findFirst().get().getValue().getCriteriaProjectProperties().getCurrentStudent().isExcluido())             
-                studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);  
+            if (ignoreExcluded && !timeline.entrySet().stream().findFirst().get().getValue().getCriteriaProjectProperties().getCurrentStudent().isExcluido()) {
+                studentsTimeline.put(folder.getName().split("-")[0].trim(), timeline);
+            }
         }
 
         return studentsTimeline;
@@ -955,7 +985,7 @@ public class ProjectsToCSV {
     }
 
     public TDDCriteriaProjectSnapshot getLastIterationStageSnapshot(Map<Date, TDDCriteriaProjectSnapshot> iteration, String tddStage) {
-        
+
         if (iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).count() > 0) {
             return iteration.entrySet().stream().filter(e -> e.getValue().getTddStage().trim().equals(tddStage)).reduce((a, b) -> b).get().getValue();
         }

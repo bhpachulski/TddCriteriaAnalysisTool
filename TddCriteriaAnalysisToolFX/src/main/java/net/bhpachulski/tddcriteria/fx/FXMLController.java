@@ -693,7 +693,7 @@ public class FXMLController implements Initializable {
                     coverageTooltip.append(df.format(branchCoverage));
                     coverageTooltip.append("\n");
                 });
-
+                
                 studentTimeLine.getValue().getjUnitSession().setTestCases(ImmutableSet.copyOf(studentTimeLine.getValue().getjUnitSession().getTestCases()).asList());
 
                 //JUNIT
@@ -713,6 +713,12 @@ public class FXMLController implements Initializable {
                 lnQntCasosDeTesteFalhando.getData().add(qntCasosTesteFalhandoData);
                 coverageTooltip.append("CT F: ").append(studentTimeLine.getValue().getjUnitSession().getTestCases().stream().filter(t -> t.isFailed()).count());
 
+                int qntLinhas = studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(f -> f.getType().equals(Type.LINE)).findFirst().get().getCovered() + 
+                        studentTimeLine.getValue().getEclemmaSession().getCounter().stream().filter(f -> f.getType().equals(Type.LINE)).findFirst().get().getMissed();
+                
+                
+                coverageTooltip.append("Linhas: ").append(qntLinhas);
+                
                 qntCasosTesteData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
                 qntCasosTestePassandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
                 qntCasosTesteFalhandoData.setNode(new HoveredThresholdNode(coverageTooltip.toString()));
